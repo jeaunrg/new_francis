@@ -1,0 +1,101 @@
+{
+    "Load": {
+        "parameters": {
+            "path": "/home/test_user/dev/francis/resources/data/lena_colored.png"
+        },
+        "state": {
+            "name": "Load",
+            "moduleType": "Load",
+            "parentNames": [],
+            "position": [
+                -1354.0,
+                -167.0
+            ],
+            "width": 250,
+            "color": [
+                255,
+                255,
+                255,
+                0
+            ]
+        }
+    },
+    "ExtractChannels": {
+        "parameters": {
+            "red": false,
+            "green": false,
+            "blue": true
+        },
+        "state": {
+            "name": "ExtractChannels",
+            "moduleType": "ExtractChannels",
+            "parentNames": [
+                "Load"
+            ],
+            "position": [
+                -1035.0,
+                -267.0
+            ],
+            "width": 250,
+            "color": [
+                255,
+                255,
+                255,
+                0
+            ]
+        }
+    },
+    "ExtractChannels_1": {
+        "parameters": {
+            "red": false,
+            "green": true,
+            "blue": false
+        },
+        "state": {
+            "name": "ExtractChannels_1",
+            "moduleType": "ExtractChannels",
+            "parentNames": [
+                "Load"
+            ],
+            "position": [
+                -1035.0,
+                115.0
+            ],
+            "width": 250,
+            "color": [
+                255,
+                255,
+                255,
+                0
+            ]
+        }
+    },
+    "Operation": {
+        "parameters": {
+            "multiply": false,
+            "add": true,
+            "subtract": false,
+            "divide": false,
+            "reference": "ExtractChannels_1"
+        },
+        "state": {
+            "name": "Operation",
+            "moduleType": "Operation",
+            "parentNames": [
+                "ExtractChannels_1",
+                "ExtractChannels"
+            ],
+            "position": [
+                -736.0,
+                -263.0
+            ],
+            "width": 250,
+            "color": [
+                255,
+                255,
+                255,
+                0
+            ]
+        }
+    }
+}

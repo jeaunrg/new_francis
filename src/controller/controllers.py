@@ -3,7 +3,7 @@ from typing import Union
 
 import numpy as np
 from PyQt5 import QtCore, QtGui
-from src.controller.utils import browse_path, qimage_from_array, show_exception
+from src.controller.utils import browse_path, qimage_from_array, raise_exception
 from src.model.models import LoadFileWM, LoadImageWM, WidgetModel
 from src.view.views import LoadFileWV, LoadImageWV, WidgetView
 
@@ -58,13 +58,13 @@ class LoadImageWC(LoadFileWC):
 
     def set_view_output(self, output: Union[np.ndarray, Exception]):
         if isinstance(output, Exception):
-            return show_exception(output)
+            return raise_exception(output)
         qimage = qimage_from_array(output)
         if qimage is None:
             message = (
                 f"Image format not known. shape={output.shape}, dtype={output.dtype}"
             )
-            return show_exception(Exception(message))
+            return raise_exception(Exception(message))
         pixmap = QtGui.QPixmap(qimage)
         pixmap = pixmap.scaledToWidth(300, QtCore.Qt.FastTransformation)
         self.view.image.setPixmap(pixmap)

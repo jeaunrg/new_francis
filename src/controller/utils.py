@@ -1,13 +1,18 @@
+import logging
 from typing import Union
 
 import numpy as np
 from PyQt5 import QtGui, QtWidgets
+
+DATA_DIR = "data/"
 
 
 def browse_path(parent=None, data_dir=None):
     """
     open a browse window to select a file and update path widget
     """
+    if data_dir is None:
+        data_dir = DATA_DIR
     dialog = QtWidgets.QFileDialog()
     filename, ok = dialog.getOpenFileName(
         parent,
@@ -20,8 +25,8 @@ def browse_path(parent=None, data_dir=None):
     return filename
 
 
-def show_exception(exception):
-    print(exception)
+def raise_exception(exception: Exception):
+    logging.warning(exception)
 
 
 def _get_arr_infos(arr: np.ndarray) -> Union[int, QtGui.QImage.Format]:

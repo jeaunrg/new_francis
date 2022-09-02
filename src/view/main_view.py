@@ -19,6 +19,15 @@ class GraphView(QtWidgets.QGraphicsView):
         self.setScene(scene)
 
 
-class ModuleView(QtWidgets.QGraphicsItem):
-    def __init__(self):
-        super().__init__()
+class GraphItem(QtWidgets.QGraphicsRectItem):
+    def __init__(self, widget):
+        super().__init__(0, 0, 75, 40)
+        proxy = QtWidgets.QGraphicsProxyWidget(self)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setBrush(QtCore.Qt.lightGray)
+        proxy.setWidget(widget)
+        proxy.setPos(0, 15)
+        proxy.setFlags(
+            QtWidgets.QGraphicsItem.ItemIsMovable
+            | QtWidgets.QGraphicsItem.ItemIsSelectable
+        )

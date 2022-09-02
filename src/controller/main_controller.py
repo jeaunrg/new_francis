@@ -1,9 +1,8 @@
 from enum import Enum
 
-from PyQt5 import QtWidgets
 from src.controller.controllers import LoadImageWC, LoadTextWC
 from src.model.main_model import MainModel
-from src.view.main_view import GraphView, MainView
+from src.view.main_view import GraphItem, GraphView, MainView
 
 
 class WidgetEnum(Enum):
@@ -25,7 +24,6 @@ class MainController:
         self.make_connections()
         self.add_tab()
         self.add_widget(WidgetEnum.load_im)
-        self.add_widget(WidgetEnum.load_txt)
 
     def make_connections(self):
         self.view.centralWidget().cornerWidget().clicked.connect(lambda: self.add_tab())
@@ -36,5 +34,6 @@ class MainController:
 
     def add_widget(self, widget_name: WidgetEnum):
         widget_controller = widget_controller_factory(widget_name)
+        item = GraphItem(widget_controller.view)
         current_graph = self.view.centralWidget().currentWidget()
-        current_graph.scene().addWidget(widget_controller.view)
+        current_graph.scene().addItem(item)

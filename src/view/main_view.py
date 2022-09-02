@@ -33,8 +33,6 @@ class GraphView(QtWidgets.QGraphicsView):
     def __init__(self):
         super().__init__()
         scene = QtWidgets.QGraphicsScene()
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorViewCenter)
-        self.setViewportUpdateMode(QtWidgets.QGraphicsView.NoViewportUpdate)
         self.setScene(scene)
         self.menu = Menu(RIGHT_CLICK_MENU)
 
@@ -69,13 +67,24 @@ class Menu(QtWidgets.QMenu):
 class GraphItem(QtWidgets.QGraphicsRectItem):
     def __init__(self, position, widget):
         super().__init__(0, 0, 75, 40)
-        proxy = QtWidgets.QGraphicsProxyWidget(self)
+        GraphProxyWidget(self, widget)  # QtWidgets.QGraphicsProxyWidget(self)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.setBrush(QtCore.Qt.lightGray)
-        proxy.setWidget(widget)
-        proxy.setPos(0, 15)
-        proxy.setFlags(
+        self.moveBy(*position)
+
+
+class GraphProxyWidget(QtWidgets.QGraphicsProxyWidget):
+    def __init__(self, item, widget):
+        super().__init__(item)
+        self.setWidget(widget)
+        self.setPos(0, 15)
+        self.setFlags(
             QtWidgets.QGraphicsItem.ItemIsMovable
             | QtWidgets.QGraphicsItem.ItemIsSelectable
         )
-        self.moveBy(*position)
+        self.menu = Menu({"test": {}})
+
+    def contextMenuEvent(self, event):
+        menu_position = QtGui.QCursor.pos()
+        self.menu.exec(menu_position)
+        return super().contextMenuEvent(event)

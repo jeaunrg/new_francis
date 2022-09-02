@@ -6,7 +6,19 @@ class MainView(QtWidgets.QMainWindow):
         super().__init__()
         self.setWindowState(QtCore.Qt.WindowActive)
         self.setWindowTitle("NewFrancis")
-        self.layout = QtWidgets.QVBoxLayout()
-        central_widget = QtWidgets.QWidget()
-        central_widget.setLayout(self.layout)
-        self.setCentralWidget(central_widget)
+        tab_widget = QtWidgets.QTabWidget()
+        new_tab_button = QtWidgets.QPushButton("+")
+        tab_widget.setCornerWidget(new_tab_button)
+        self.setCentralWidget(tab_widget)
+
+
+class GraphView(QtWidgets.QGraphicsView):
+    def __init__(self):
+        super().__init__()
+        scene = QtWidgets.QGraphicsScene()
+        self.setScene(scene)
+
+
+class ModuleView(QtWidgets.QGraphicsItem):
+    def __init__(self):
+        super().__init__()

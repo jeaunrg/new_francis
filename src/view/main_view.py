@@ -6,3 +6,7 @@ class MainView(QtWidgets.QMainWindow):
         super().__init__()
         self.setWindowState(QtCore.Qt.WindowActive)
         self.setWindowTitle("NewFrancis")
+        self.layout = QtWidgets.QVBoxLayout()
+        central_widget = QtWidgets.QWidget()
+        central_widget.setLayout(self.layout)
+        self.setCentralWidget(central_widget)

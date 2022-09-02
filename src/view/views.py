@@ -42,3 +42,11 @@ class LoadImageWV(LoadFileWV):
         self.image = QtWidgets.QLabel()
         content_widget.layout().addWidget(self.image)
         return content_widget
+
+
+class LoadTextWV(LoadFileWV):
+    def make_content(self):
+        content_widget = super().make_content()
+        self.text = QtWidgets.QTextEdit()
+        content_widget.layout().addWidget(self.text)
+        return content_widget

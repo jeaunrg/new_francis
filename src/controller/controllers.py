@@ -4,8 +4,8 @@ from typing import Union
 import numpy as np
 from PyQt5 import QtCore, QtGui
 from src.controller.utils import browse_path, qimage_from_array, raise_exception
-from src.model.models import LoadFileWM, LoadImageWM, WidgetModel
-from src.view.views import LoadFileWV, LoadImageWV, WidgetView
+from src.model.models import LoadFileWM, LoadImageWM, LoadTextWM, WidgetModel
+from src.view.views import LoadFileWV, LoadImageWV, LoadTextWV, WidgetView
 
 
 class WidgetController:
@@ -68,3 +68,13 @@ class LoadImageWC(LoadFileWC):
         pixmap = QtGui.QPixmap(qimage)
         pixmap = pixmap.scaledToWidth(300, QtCore.Qt.FastTransformation)
         self.view.image.setPixmap(pixmap)
+
+
+class LoadTextWC(LoadFileWC):
+    model_class = LoadTextWM
+    view_class = LoadTextWV
+
+    def set_view_output(self, output: Union[str, Exception]):
+        if isinstance(output, Exception):
+            return raise_exception(output)
+        self.view.text.setText(output)

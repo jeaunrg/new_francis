@@ -26,11 +26,13 @@ class MainController:
         self.add_widget(WidgetEnum.load_im)
 
     def make_connections(self):
-        self.view.centralWidget().cornerWidget().clicked.connect(lambda: self.add_tab())
+        tab_widget = self.view.centralWidget()
+        tab_widget.tabCloseRequested.connect(lambda index: tab_widget.removeTab(index))
+        tab_widget.cornerWidget().clicked.connect(lambda: self.add_tab())
 
     def add_tab(self):
         graph_view = GraphView()
-        self.view.centralWidget().addTab(graph_view, "Tab1")
+        self.view.centralWidget().addTab(graph_view, "Graph")
 
     def add_widget(self, widget_name: WidgetEnum):
         widget_controller = widget_controller_factory(widget_name)

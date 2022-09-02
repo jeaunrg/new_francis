@@ -7,6 +7,7 @@ class MainView(QtWidgets.QMainWindow):
         self.setWindowState(QtCore.Qt.WindowActive)
         self.setWindowTitle("NewFrancis")
         tab_widget = QtWidgets.QTabWidget()
+        tab_widget.setTabsClosable(True)
         new_tab_button = QtWidgets.QPushButton("+")
         tab_widget.setCornerWidget(new_tab_button)
         self.setCentralWidget(tab_widget)

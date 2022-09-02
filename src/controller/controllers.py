@@ -1,15 +1,16 @@
 from abc import abstractmethod
+from typing import Union
 
 import numpy as np
 from PyQt5 import QtCore, QtGui
-from src.controller.utils import browse_path
-from src.model.models import BaseWidgetModel, LoadWidgetModel
-from src.view.views import BaseWidgetView, LoadWidgetView
+from src.controller.utils import browse_path, qimage_from_array, show_exception
+from src.model.models import LoadFileWM, LoadImageWM, WidgetModel
+from src.view.views import LoadFileWV, LoadImageWV, WidgetView
 
 
 class WidgetController:
-    model_class = BaseWidgetModel
-    view_class = BaseWidgetView
+    model_class = WidgetModel
+    view_class = WidgetView
 
     def __init__(self):
         self.model = self.model_class()
@@ -33,9 +34,9 @@ class WidgetController:
         pass
 
 
-class LoadWidgetController(WidgetController):
-    model_class = LoadWidgetModel
-    view_class = LoadWidgetView
+class LoadFileWC(WidgetController):
+    model_class = LoadFileWM
+    view_class = LoadFileWV
 
     def make_connections(self):
         super().make_connections()
@@ -50,14 +51,20 @@ class LoadWidgetController(WidgetController):
     def get_view_input(self) -> dict:
         return {"path": self.view.path.text()}
 
-    def set_view_output(self, output):
-        if isinstance(output, np.ndarray):
-            qimage = QtGui.QImage(
-                output,
-                output.shape[1],
-                output.shape[0],
-                QtGui.QImage.Format_RGB888,
+
+class LoadImageWC(LoadFileWC):
+    model_class = LoadImageWM
+    view_class = LoadImageWV
+
+    def set_view_output(self, output: Union[np.ndarray, Exception]):
+        if isinstance(output, Exception):
+            return show_exception(output)
+        qimage = qimage_from_array(output)
+        if qimage is None:
+            message = (
+                f"Image format not known. shape={output.shape}, dtype={output.dtype}"
             )
-            pixmap = QtGui.QPixmap(qimage)
-            pixmap = pixmap.scaled(640, 400, QtCore.Qt.KeepAspectRatio)
-            self.view.image.setPixmap(pixmap)
+            return show_exception(Exception(message))
+        pixmap = QtGui.QPixmap(qimage)
+        pixmap = pixmap.scaledToWidth(300, QtCore.Qt.FastTransformation)
+        self.view.image.setPixmap(pixmap)

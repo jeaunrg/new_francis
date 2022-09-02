@@ -1,6 +1,6 @@
 from enum import Enum
 
-from src.controller.controllers import LoadWidgetController
+from src.controller.controllers import LoadImageWC
 from src.model.main_model import MainModel
 from src.view.main_view import MainView
 
@@ -11,7 +11,7 @@ class WidgetEnum(Enum):
 
 def widget_controller_factory(widget_name: WidgetEnum):
     if widget_name == WidgetEnum.load:
-        return LoadWidgetController()
+        return LoadImageWC()
 
 
 class MainController:

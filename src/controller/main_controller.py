@@ -55,23 +55,23 @@ class MainController:
 class GraphController:
     def __init__(self):
         self.view = GraphView()
-        self.make_connections()
+        self.menu = Menu()
         self.focused_widget = None
         self.widget_position = QtCore.QPoint(0, 0)
-        self.add_widget(WidgetEnum.load_im)
+        self.make_connections()
 
     def make_connections(self):
         self.view.right_clicked.connect(lambda x, y: self.open_menu(x, y))
+        self.menu.activated.connect(
+            lambda activation_key: self.add_widget(WIDGET_NAME_DICT[activation_key])
+        )
 
     def open_menu(self, x, y):
         position = QtCore.QPoint(x, y)
         self.widget_position = self.view.mapToScene(self.view.mapFromGlobal(position))
         menu_key = "scene" if self.focused_widget is None else self.focused_widget.name
-        menu = Menu(RIGHT_CLICK_MENU[menu_key])
-        menu.activated.connect(
-            lambda activation_key: self.add_widget(WIDGET_NAME_DICT[activation_key])
-        )
-        menu.exec(position)
+        self.menu.build(RIGHT_CLICK_MENU[menu_key])
+        self.menu.exec(position)
 
     def set_focused_widget_cotroller(
         self, widget_controller: WidgetController, focused: bool

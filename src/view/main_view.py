@@ -58,18 +58,20 @@ class GraphProxy(QtWidgets.QGraphicsProxyWidget):
 class Menu(QtWidgets.QMenu):
     activated = QtCore.pyqtSignal(str)
 
-    def __init__(self, menu_dict: dict):
+    def __init__(self, menu_dict: dict = {}):
         super().__init__()
-        for key, values in menu_dict.items():
-            self.recursive_fill_menu(self, key, values, key)
+        self.build(menu_dict)
 
-    def recursive_fill_menu(self, menu, key, values, activation_key):
+    def build(self, menu_dict: dict):
+        self.clear()
+        for key, values in menu_dict.items():
+            self._build_recursively(self, key, values, key)
+
+    def _build_recursively(self, menu, key, values, activation_key):
         if len(values) == 0:
             action = menu.addAction(key)
             action.triggered.connect(lambda: self.activated.emit(activation_key))
         else:
             submenu = menu.addMenu(key)
             for key, values in values.items():
-                self.recursive_fill_menu(
-                    submenu, key, values, f"{activation_key}:{key}"
-                )
+                self._build_recursively(submenu, key, values, f"{activation_key}:{key}")

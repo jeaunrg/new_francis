@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from enum import Enum
 from typing import Union
 
 import numpy as np
@@ -8,11 +9,16 @@ from src.model.models import LoadFileWM, LoadImageWM, LoadTextWM, WidgetModel
 from src.view.views import LoadFileWV, LoadImageWV, LoadTextWV, WidgetView
 
 
+class WidgetEnum(Enum):
+    load_im = "load_im"
+    load_txt = "load_txt"
+
+
 class WidgetController:
     model_class = WidgetModel
     view_class = WidgetView
 
-    def __init__(self, name):
+    def __init__(self, name: WidgetEnum):
         self.name = name
         self.model = self.model_class()
         self.view = self.view_class()

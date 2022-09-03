@@ -7,7 +7,9 @@ from PyQt5 import QtGui, QtWidgets
 DATA_DIR = "data/"
 
 
-def browse_path(parent=None, data_dir=None):
+def browse_path(
+    parent: QtWidgets.QWidget or None = None, data_dir: str or None = None
+) -> str:
     """
     open a browse window to select a file and update path widget
     """
@@ -29,7 +31,7 @@ def raise_exception(exception: Exception):
     logging.warning(exception)
 
 
-def _get_arr_infos(arr: np.ndarray) -> Union[int, QtGui.QImage.Format]:
+def _get_arr_infos(arr: np.ndarray) -> Union[int or None, QtGui.QImage.Format or None]:
     bytes_per_line, im_format = None, None
     if arr.ndim == 2:
         bytes_per_line = arr.shape[1]

@@ -1,15 +1,8 @@
-from enum import Enum
-
 from PyQt5 import QtCore, QtWidgets
-from src.controller.controllers import LoadImageWC, LoadTextWC, WidgetController
+from src.controller.controllers import (LoadImageWC, LoadTextWC,
+                                        WidgetController, WidgetEnum)
 from src.model.main_model import MainModel
 from src.view.main_view import GraphProxy, GraphView, MainView, Menu
-
-
-class WidgetEnum(Enum):
-    load_im = "load_im"
-    load_txt = "load_txt"
-
 
 WIDGET_NAME_DICT = {
     "load:image": WidgetEnum.load_im,
@@ -22,7 +15,7 @@ RIGHT_CLICK_MENU = {
 }
 
 
-def widget_controller_factory(widget_name: WidgetEnum):
+def widget_controller_factory(widget_name: WidgetEnum) -> WidgetController:
     if widget_name == WidgetEnum.load_im:
         return LoadImageWC(widget_name)
     if widget_name == WidgetEnum.load_txt:
@@ -57,21 +50,22 @@ class GraphController:
         self.view = GraphView()
         self.menu = Menu()
         self.focused_widget = None
-        self.widget_position = QtCore.QPoint(0, 0)
+        self.widget_position = QtCore.QPointF(0, 0)
         self.make_connections()
 
     def make_connections(self):
-        self.view.right_clicked.connect(lambda x, y: self.open_menu(x, y))
+        self.view.right_clicked.connect(lambda position: self.open_menu(position))
         self.menu.activated.connect(
             lambda activation_key: self.add_widget(WIDGET_NAME_DICT[activation_key])
         )
 
-    def open_menu(self, x, y):
-        position = QtCore.QPoint(x, y)
-        self.widget_position = self.view.mapToScene(self.view.mapFromGlobal(position))
+    def open_menu(self, menu_position: QtCore.QPoint):
+        self.widget_position = self.view.mapToScene(
+            self.view.mapFromGlobal(menu_position)
+        )
         menu_key = "scene" if self.focused_widget is None else self.focused_widget.name
         self.menu.build(RIGHT_CLICK_MENU[menu_key])
-        self.menu.exec(position)
+        self.menu.exec(menu_position)
 
     def set_focused_widget_cotroller(
         self, widget_controller: WidgetController, focused: bool

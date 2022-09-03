@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
+from src.view.views import WidgetView
 
 POPUPS = {
     "close_scene": (
@@ -27,21 +28,21 @@ class MainView(QtWidgets.QMainWindow):
 
 
 class GraphView(QtWidgets.QGraphicsView):
-    right_clicked = QtCore.pyqtSignal(int, int)
+    right_clicked = QtCore.pyqtSignal(QtCore.QPoint)
 
     def __init__(self):
         super().__init__()
         scene = QtWidgets.QGraphicsScene()
         self.setScene(scene)
 
-    def contextMenuEvent(self, event):
+    def contextMenuEvent(self, event: QtGui.QContextMenuEvent):
         position = QtGui.QCursor.pos()
-        self.right_clicked.emit(position.x(), position.y())
+        self.right_clicked.emit(position)
         return super().contextMenuEvent(event)
 
 
 class GraphProxy(QtWidgets.QGraphicsProxyWidget):
-    def __init__(self, widget, position):
+    def __init__(self, widget: WidgetView, position: QtCore.QPoint):
         self.item = QtWidgets.QGraphicsRectItem(0, 0, 75, 40)
         self.item.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.item.setBrush(QtCore.Qt.lightGray)
@@ -67,7 +68,9 @@ class Menu(QtWidgets.QMenu):
         for key, values in menu_dict.items():
             self._build_recursively(self, key, values, key)
 
-    def _build_recursively(self, menu, key, values, activation_key):
+    def _build_recursively(
+        self, menu: QtWidgets.QMenu, key: str, values: dict, activation_key: str
+    ):
         if len(values) == 0:
             action = menu.addAction(key)
             action.triggered.connect(lambda: self.activated.emit(activation_key))

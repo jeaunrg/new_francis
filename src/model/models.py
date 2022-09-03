@@ -22,7 +22,7 @@ class LoadFileWM(WidgetModel):
         else:
             return self.load(file_path)
 
-    def check_path(self, path: str):
+    def check_path(self, path: str) -> Exception or None:
         _, ext = os.path.splitext(path)
         if not os.path.isfile(path):
             return Exception(f"'{path}' is not a file")
@@ -48,7 +48,7 @@ class LoadImageWM(LoadFileWM):
 class LoadTextWM(LoadFileWM):
     accepted_extensions = [".txt"]
 
-    def load(self, path: str) -> np.ndarray:
+    def load(self, path: str) -> str:
         with open(path, "rb") as f:
             text_bytes = f.read()
         text = text_bytes.decode("utf-8")

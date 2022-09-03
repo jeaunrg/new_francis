@@ -31,18 +31,13 @@ class GraphView(QtWidgets.QGraphicsView):
 
     def __init__(self):
         super().__init__()
-        scene = GraphScene()
+        scene = QtWidgets.QGraphicsScene()
         self.setScene(scene)
 
     def contextMenuEvent(self, event):
         position = QtGui.QCursor.pos()
         self.right_clicked.emit(position.x(), position.y())
         return super().contextMenuEvent(event)
-
-
-class GraphScene(QtWidgets.QGraphicsScene):
-    def __init__(self):
-        super().__init__()
 
 
 class GraphProxy(QtWidgets.QGraphicsProxyWidget):

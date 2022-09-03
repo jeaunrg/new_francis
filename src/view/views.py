@@ -7,9 +7,8 @@ class WidgetView(QtWidgets.QWidget):
     submit_text = "Validate"
     focused = QtCore.pyqtSignal(bool)
 
-    def __init__(self, name):
+    def __init__(self):
         super(WidgetView, self).__init__()
-        self.name = name
         content_widget = self.make_content()
         self.message = QtWidgets.QLabel("")
         self.button = QtWidgets.QPushButton(self.submit_text)

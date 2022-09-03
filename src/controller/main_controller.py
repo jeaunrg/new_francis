@@ -1,10 +1,9 @@
 from enum import Enum
 
 from PyQt5 import QtCore, QtWidgets
-from src.controller.controllers import LoadImageWC, LoadTextWC
+from src.controller.controllers import LoadImageWC, LoadTextWC, WidgetController
 from src.model.main_model import MainModel
-from src.view.main_view import GraphView, GraphWidget, MainView, Menu
-from src.view.views import WidgetView
+from src.view.main_view import GraphProxy, GraphView, MainView, Menu
 
 
 class WidgetEnum(Enum):
@@ -74,16 +73,20 @@ class GraphController:
         )
         menu.exec(position)
 
-    def set_focused_widget(self, widget_view: WidgetView, focused: bool):
-        if focused and self.focused_widget != widget_view:
-            self.focused_widget = widget_view
-        elif not focused and self.focused_widget == widget_view:
+    def set_focused_widget_cotroller(
+        self, widget_controller: WidgetController, focused: bool
+    ):
+        if focused and self.focused_widget != widget_controller:
+            self.focused_widget = widget_controller
+        elif not focused and self.focused_widget == widget_controller:
             self.focused_widget = None
 
     def add_widget(self, widget_name: WidgetEnum):
         widget_controller = widget_controller_factory(widget_name)
         widget_controller.view.focused.connect(
-            lambda focused: self.set_focused_widget(widget_controller.view, focused)
+            lambda focused: self.set_focused_widget_cotroller(
+                widget_controller, focused
+            )
         )
-        proxy = GraphWidget(widget_controller.view, self.widget_position)
+        proxy = GraphProxy(widget_controller.view, self.widget_position)
         self.view.scene().addItem(proxy.item)

@@ -45,7 +45,7 @@ class GraphScene(QtWidgets.QGraphicsScene):
         super().__init__()
 
 
-class GraphWidget(QtWidgets.QGraphicsProxyWidget):
+class GraphProxy(QtWidgets.QGraphicsProxyWidget):
     def __init__(self, widget, position):
         self.item = QtWidgets.QGraphicsRectItem(0, 0, 75, 40)
         self.item.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)

@@ -1,7 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
-RIGHT_CLICK_MENU = {"load": {"image": {}, "text": {}}}
 POPUPS = {
     "close_scene": (
         "Are you sure to close this scene ?",
@@ -28,20 +27,37 @@ class MainView(QtWidgets.QMainWindow):
 
 
 class GraphView(QtWidgets.QGraphicsView):
-    mouse_clicked = QtCore.pyqtSignal(int, int)
+    right_clicked = QtCore.pyqtSignal(int, int)
 
     def __init__(self):
         super().__init__()
-        scene = QtWidgets.QGraphicsScene()
+        scene = GraphScene()
         self.setScene(scene)
-        self.menu = Menu(RIGHT_CLICK_MENU)
 
     def contextMenuEvent(self, event):
-        menu_position = QtGui.QCursor.pos()
-        mouse_position = self.mapToScene(self.mapFromGlobal(menu_position))
-        self.mouse_clicked.emit(mouse_position.x(), mouse_position.y())
-        self.menu.exec(menu_position)
+        position = QtGui.QCursor.pos()
+        self.right_clicked.emit(position.x(), position.y())
         return super().contextMenuEvent(event)
+
+
+class GraphScene(QtWidgets.QGraphicsScene):
+    def __init__(self):
+        super().__init__()
+
+
+class GraphWidget(QtWidgets.QGraphicsProxyWidget):
+    def __init__(self, widget, position):
+        self.item = QtWidgets.QGraphicsRectItem(0, 0, 75, 40)
+        self.item.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.item.setBrush(QtCore.Qt.lightGray)
+        self.item.moveBy(position.x(), position.y())
+        super().__init__(self.item)
+        self.setWidget(widget)
+        self.setPos(0, 15)
+        self.setFlags(
+            QtWidgets.QGraphicsItem.ItemIsMovable
+            | QtWidgets.QGraphicsItem.ItemIsSelectable
+        )
 
 
 class Menu(QtWidgets.QMenu):
@@ -62,29 +78,3 @@ class Menu(QtWidgets.QMenu):
                 self.recursive_fill_menu(
                     submenu, key, values, f"{activation_key}:{key}"
                 )
-
-
-class GraphItem(QtWidgets.QGraphicsRectItem):
-    def __init__(self, position, widget):
-        super().__init__(0, 0, 75, 40)
-        GraphProxyWidget(self, widget)  # QtWidgets.QGraphicsProxyWidget(self)
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
-        self.setBrush(QtCore.Qt.lightGray)
-        self.moveBy(*position)
-
-
-class GraphProxyWidget(QtWidgets.QGraphicsProxyWidget):
-    def __init__(self, item, widget):
-        super().__init__(item)
-        self.setWidget(widget)
-        self.setPos(0, 15)
-        self.setFlags(
-            QtWidgets.QGraphicsItem.ItemIsMovable
-            | QtWidgets.QGraphicsItem.ItemIsSelectable
-        )
-        self.menu = Menu({"test": {}})
-
-    def contextMenuEvent(self, event):
-        menu_position = QtGui.QCursor.pos()
-        self.menu.exec(menu_position)
-        return super().contextMenuEvent(event)

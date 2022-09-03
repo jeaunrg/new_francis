@@ -12,9 +12,9 @@ class WidgetController:
     model_class = WidgetModel
     view_class = WidgetView
 
-    def __init__(self):
+    def __init__(self, widget_name):
         self.model = self.model_class()
-        self.view = self.view_class()
+        self.view = self.view_class(widget_name)
         self.make_connections()
 
     def make_connections(self):

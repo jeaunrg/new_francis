@@ -1,13 +1,15 @@
 from abc import abstractmethod
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
 class WidgetView(QtWidgets.QWidget):
     submit_text = "Validate"
+    focused = QtCore.pyqtSignal(bool)
 
-    def __init__(self):
+    def __init__(self, name):
         super(WidgetView, self).__init__()
+        self.name = name
         content_widget = self.make_content()
         self.message = QtWidgets.QLabel("")
         self.button = QtWidgets.QPushButton(self.submit_text)
@@ -16,6 +18,14 @@ class WidgetView(QtWidgets.QWidget):
         mainLayout.addWidget(self.message)
         mainLayout.addWidget(self.button)
         self.setLayout(mainLayout)
+
+    def enterEvent(self, event):
+        self.focused.emit(True)
+        return super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self.focused.emit(False)
+        return super().leaveEvent(event)
 
     @abstractmethod
     def make_content(self) -> QtWidgets.QWidget:

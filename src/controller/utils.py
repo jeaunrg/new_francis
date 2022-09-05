@@ -2,7 +2,7 @@ import logging
 from typing import Union
 
 import numpy as np
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 DATA_DIR = "data/"
 

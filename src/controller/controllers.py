@@ -3,9 +3,10 @@ from enum import Enum
 from typing import Union
 
 import numpy as np
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from src.controller.utils import browse_path, qimage_from_array, raise_exception
 from src.model.models import LoadFileWM, LoadImageWM, LoadTextWM, WidgetModel
+from src.view.items import WidgetItem
 from src.view.views import LoadFileWV, LoadImageWV, LoadTextWV, WidgetView
 
 
@@ -14,14 +15,16 @@ class WidgetEnum(Enum):
     load_txt = "load_txt"
 
 
-class WidgetController:
+class Widget:
     model_class = WidgetModel
     view_class = WidgetView
 
-    def __init__(self, name: WidgetEnum):
+    def __init__(self, name: WidgetEnum, position, parent_list: list = []):
         self.name = name
+        self.parent_list = parent_list
         self.model = self.model_class()
         self.view = self.view_class()
+        self.item = WidgetItem(self, position)
         self.make_connections()
 
     def make_connections(self):
@@ -41,7 +44,7 @@ class WidgetController:
         pass
 
 
-class LoadFileWC(WidgetController):
+class LoadFileW(Widget):
     model_class = LoadFileWM
     view_class = LoadFileWV
 
@@ -59,7 +62,7 @@ class LoadFileWC(WidgetController):
         return {"path": self.view.path.text()}
 
 
-class LoadImageWC(LoadFileWC):
+class LoadImageW(LoadFileW):
     model_class = LoadImageWM
     view_class = LoadImageWV
 
@@ -77,7 +80,7 @@ class LoadImageWC(LoadFileWC):
         self.view.image.setPixmap(pixmap)
 
 
-class LoadTextWC(LoadFileWC):
+class LoadTextW(LoadFileW):
     model_class = LoadTextWM
     view_class = LoadTextWV
 

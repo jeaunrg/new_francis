@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtWidgets
 class WidgetView(QtWidgets.QWidget):
     submit_text = "Validate"
     focused = QtCore.pyqtSignal(bool)
+    position_changed = QtCore.pyqtSignal()
 
     def __init__(self):
         super(WidgetView, self).__init__()
@@ -17,6 +18,9 @@ class WidgetView(QtWidgets.QWidget):
         mainLayout.addWidget(self.message)
         mainLayout.addWidget(self.button)
         self.setLayout(mainLayout)
+
+    def is_selected(self):
+        return True
 
     def enterEvent(self, event):
         self.focused.emit(True)

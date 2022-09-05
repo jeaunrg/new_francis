@@ -1,3 +1,4 @@
+import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from src.view.views import WidgetView
@@ -39,21 +40,6 @@ class GraphView(QtWidgets.QGraphicsView):
         position = QtGui.QCursor.pos()
         self.right_clicked.emit(position)
         return super().contextMenuEvent(event)
-
-
-class GraphProxy(QtWidgets.QGraphicsProxyWidget):
-    def __init__(self, widget: WidgetView, position: QtCore.QPoint):
-        self.item = QtWidgets.QGraphicsRectItem(0, 0, 75, 40)
-        self.item.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
-        self.item.setBrush(QtCore.Qt.lightGray)
-        self.item.moveBy(position.x(), position.y())
-        super().__init__(self.item)
-        self.setWidget(widget)
-        self.setPos(0, 15)
-        self.setFlags(
-            QtWidgets.QGraphicsItem.ItemIsMovable
-            | QtWidgets.QGraphicsItem.ItemIsSelectable
-        )
 
 
 class Menu(QtWidgets.QMenu):

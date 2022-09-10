@@ -99,16 +99,16 @@ class GraphController:
 
 
 class GraphLinkController:
-    def __init__(self, parent, child):
+    def __init__(self, parent: Widget, child: Widget):
         self.parent = parent
         self.child = child
         self.item = GraphLinkItem()
         self.make_connections()
 
     def make_connections(self):
-        self.parent.positionChanged.connect(
-            lambda: self.item.draw(self.parent.view, self.child.view())
+        self.parent.view.position_changed.connect(
+            lambda: self.item.draw(self.parent.item, self.child.item)
         )
-        self.child.positionChanged.connect(
-            lambda: self.item.draw(self.parent.view, self.child.view())
+        self.child.view.position_changed.connect(
+            lambda: self.item.draw(self.parent.item, self.child.item)
         )

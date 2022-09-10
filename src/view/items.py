@@ -1,11 +1,16 @@
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
+from src.view.views import WidgetView
 
 
 class WidgetItem(QtWidgets.QGraphicsRectItem):
-    def __init__(self, widget, position):
+    def __init__(self, view: WidgetView, position: QtCore.QPointF):
         super().__init__(0, 0, 75, 40)
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.view = view
+        self.setFlags(
+            QtWidgets.QGraphicsItem.ItemIsMovable
+            | QtWidgets.QGraphicsItem.ItemSendsScenePositionChanges
+        )
         self.setBrush(QtCore.Qt.lightGray)
         self.moveBy(position.x(), position.y())
         proxy = QtWidgets.QGraphicsProxyWidget(self)
@@ -14,11 +19,17 @@ class WidgetItem(QtWidgets.QGraphicsRectItem):
             QtWidgets.QGraphicsItem.ItemIsMovable
             | QtWidgets.QGraphicsItem.ItemIsSelectable
         )
-        proxy.setWidget(widget.view)
+        proxy.setWidget(view)
+
+    def itemChange(self, change, value):
+        if change == QtWidgets.QGraphicsItem.ItemPositionChange:
+            self.view.position_changed.emit()
+        return super().itemChange(change, value)
 
 
 class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
     def __init__(self):
+        super().__init__()
         border_color = (0, 150, 0)
         border_width = 2
         color = (0, 150, 0)
@@ -56,7 +67,7 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
                 return intersection_point
         return QtCore.QPointF()
 
-    def draw(self, parent, child):
+    def draw(self, parent: WidgetItem, child: WidgetItem):
         """
         This method create the arrow between child and parent
         

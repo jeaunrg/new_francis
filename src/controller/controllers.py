@@ -19,12 +19,14 @@ class Widget:
     model_class = WidgetModel
     view_class = WidgetView
 
-    def __init__(self, name: WidgetEnum, position, parent_list: list = []):
+    def __init__(
+        self, name: WidgetEnum, position: QtCore.QPointF, parent_list: list = []
+    ):
         self.name = name
         self.parent_list = parent_list
         self.model = self.model_class()
         self.view = self.view_class()
-        self.item = WidgetItem(self, position)
+        self.item = WidgetItem(self.view, position)
         self.make_connections()
 
     def make_connections(self):

@@ -4,8 +4,14 @@ from src.view.views import WidgetView
 
 
 class WidgetItem(QtWidgets.QGraphicsRectItem):
-    def __init__(self, view: WidgetView, position: QtCore.QPointF):
-        super().__init__(0, 0, 75, 40)
+    def __init__(
+        self,
+        view: WidgetView,
+        position: QtCore.QPointF,
+        width: int = 70,
+        height: int = 10,
+    ):
+        super().__init__(0, -height, width, height)
         self.view = view
         self.setFlags(
             QtWidgets.QGraphicsItem.ItemIsMovable
@@ -13,13 +19,14 @@ class WidgetItem(QtWidgets.QGraphicsRectItem):
         )
         self.setBrush(QtCore.Qt.lightGray)
         self.moveBy(position.x(), position.y())
+        self.setCursor(QtCore.Qt.SizeAllCursor)
         proxy = QtWidgets.QGraphicsProxyWidget(self)
-        proxy.setPos(0, 15)
         proxy.setFlags(
             QtWidgets.QGraphicsItem.ItemIsMovable
             | QtWidgets.QGraphicsItem.ItemIsSelectable
         )
         proxy.setWidget(view)
+        self.proxy_rect = proxy.rect
 
     def itemChange(self, change, value):
         if change == QtWidgets.QGraphicsItem.ItemPositionChange:
@@ -33,12 +40,13 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         border_color = (0, 150, 0)
         border_width = 2
         color = (0, 150, 0)
+        self.setZValue(-1)
         self.setPen(QtGui.QPen(QtGui.QColor(*border_color), border_width))
         self.setBrush(QtGui.QColor(*color))
         self.width = 5
         self.arrow_width = 10
         self.arrow_len = 10
-        self.space = [0, 20]
+        self.space = [10, 20]
 
     def intersects(
         self, line: QtCore.QLineF, rect: QtCore.QRect, rect_position: QtCore.QPoint
@@ -81,7 +89,7 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
                                p24
         """
         # build direction line
-        r1, r2 = parent.rect(), child.rect()
+        r1, r2 = parent.proxy_rect(), child.proxy_rect()
         line = QtCore.QLineF(parent.pos() + r1.center(), child.pos() + r2.center())
 
         # build unit vectors
@@ -94,12 +102,10 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         # set arrow points
         parent_intersection = self.intersects(line, r1, parent.pos())
         if parent_intersection is None:
-            self.setPolygon(QtGui.QPolygonF())
-            return
+            return self.setPolygon(QtGui.QPolygonF())
         child_intersection = self.intersects(line, r2, child.pos())
         if child_intersection is None:
-            self.setPolygon(QtGui.QPolygonF())
-            return
+            return self.setPolygon(QtGui.QPolygonF())
         p1 = parent_intersection + unit * self.space[0]
         p2 = child_intersection - unit * self.space[1]
         p12 = p1 - normal * self.width
@@ -107,8 +113,7 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         if np.sign((p22 - p12).x()) != np.sign(unit.x()) or np.sign(
             (p22 - p12).y()
         ) != np.sign(unit.y()):
-            self.setPolygon(QtGui.QPolygonF())
-            return
+            return self.setPolygon(QtGui.QPolygonF())
         p11 = p1 + normal * self.width
         p21 = p2 + normal * self.width - unit * self.arrow_len
         p23 = p2 + normal * self.arrow_width - unit * self.arrow_len

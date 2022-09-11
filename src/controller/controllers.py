@@ -1,18 +1,25 @@
 from abc import abstractmethod
-from enum import Enum
 from typing import Union
 
 import numpy as np
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui
 from src.controller.utils import browse_path, qimage_from_array, raise_exception
-from src.model.models import LoadFileWM, LoadImageWM, LoadTextWM, WidgetModel
+from src.metadata.metadata import WidgetEnum
+from src.model.models import (
+    BasicMorphoWM,
+    LoadFileWM,
+    LoadImageWM,
+    LoadTextWM,
+    WidgetModel,
+)
 from src.view.items import WidgetItem
-from src.view.views import LoadFileWV, LoadImageWV, LoadTextWV, WidgetView
-
-
-class WidgetEnum(Enum):
-    load_im = "load_im"
-    load_txt = "load_txt"
+from src.view.views import (
+    BasicMorphoWV,
+    LoadFileWV,
+    LoadImageWV,
+    LoadTextWV,
+    WidgetView,
+)
 
 
 class Widget:
@@ -27,6 +34,7 @@ class Widget:
         self.model = self.model_class()
         self.view = self.view_class()
         self.item = WidgetItem(self.view, position)
+        self.output = Exception("No output yet.")
         self.make_connections()
 
     def make_connections(self):
@@ -34,8 +42,9 @@ class Widget:
 
     def submit(self):
         view_input_dict = self.get_view_input()
-        output = self.model.compute(view_input_dict)
-        self.set_view_output(output)
+        self.output = self.model.compute(**view_input_dict)
+        print(self.output)
+        self.set_view_output(self.output)
 
     @abstractmethod
     def get_view_input(self) -> dict:
@@ -44,6 +53,21 @@ class Widget:
     @abstractmethod
     def set_view_output(self, output):
         pass
+
+
+class OutputImageMixin:
+    def set_view_output(self, output: Union[np.ndarray, Exception]):
+        if isinstance(output, Exception):
+            return raise_exception(output)
+        qimage = qimage_from_array(output)
+        if qimage is None:
+            message = (
+                f"Image format not known. shape={output.shape}, dtype={output.dtype}"
+            )
+            return raise_exception(Exception(message))
+        pixmap = QtGui.QPixmap(qimage)
+        pixmap = pixmap.scaledToWidth(300, QtCore.Qt.FastTransformation)
+        self.view.image.setPixmap(pixmap)
 
 
 class LoadFileW(Widget):
@@ -61,25 +85,12 @@ class LoadFileW(Widget):
             self.view.path.setToolTip(filename)
 
     def get_view_input(self) -> dict:
-        return {"path": self.view.path.text()}
+        return {"file_path": self.view.path.text()}
 
 
-class LoadImageW(LoadFileW):
+class LoadImageW(OutputImageMixin, LoadFileW):
     model_class = LoadImageWM
     view_class = LoadImageWV
-
-    def set_view_output(self, output: Union[np.ndarray, Exception]):
-        if isinstance(output, Exception):
-            return raise_exception(output)
-        qimage = qimage_from_array(output)
-        if qimage is None:
-            message = (
-                f"Image format not known. shape={output.shape}, dtype={output.dtype}"
-            )
-            return raise_exception(Exception(message))
-        pixmap = QtGui.QPixmap(qimage)
-        pixmap = pixmap.scaledToWidth(300, QtCore.Qt.FastTransformation)
-        self.view.image.setPixmap(pixmap)
 
 
 class LoadTextW(LoadFileW):
@@ -90,3 +101,16 @@ class LoadTextW(LoadFileW):
         if isinstance(output, Exception):
             return raise_exception(output)
         self.view.text.setText(output)
+
+
+class BasicMorphoW(OutputImageMixin, Widget):
+    model_class = BasicMorphoWM
+    view_class = BasicMorphoWV
+
+    def get_view_input(self) -> dict:
+        return {
+            "im": self.parent_list[0].output,
+            "operation": self.view.operations.checkedButton().text(),
+            "size": self.view.size.value(),
+            "is_round_shape": self.view.is_round_shape.isChecked(),
+        }

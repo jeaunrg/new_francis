@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 from PyQt5 import QtCore, QtWidgets
+from src.metadata.metadata import OPERATION_DICT
 
 
 class WidgetView(QtWidgets.QWidget):
@@ -62,4 +63,25 @@ class LoadTextWV(LoadFileWV):
         content_widget = super().make_content()
         self.text = QtWidgets.QTextEdit()
         content_widget.layout().addWidget(self.text)
+        return content_widget
+
+
+class BasicMorphoWV(WidgetView):
+    submit_text = "apply"
+
+    def make_content(self):
+        layout = QtWidgets.QVBoxLayout()
+        self.operations = QtWidgets.QButtonGroup()
+        for operation_name in OPERATION_DICT["morpho:basic"].keys():
+            operation_button = QtWidgets.QRadioButton(operation_name)
+            layout.addWidget(operation_button)
+            self.operations.addButton(operation_button)
+        self.size = QtWidgets.QSpinBox()
+        self.is_round_shape = QtWidgets.QCheckBox("round shape")
+        self.image = QtWidgets.QLabel()
+        layout.addWidget(self.size)
+        layout.addWidget(self.is_round_shape)
+        layout.addWidget(self.image)
+        content_widget = QtWidgets.QWidget()
+        content_widget.setLayout(layout)
         return content_widget

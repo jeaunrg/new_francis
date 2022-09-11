@@ -1,27 +1,26 @@
 from PyQt5 import QtCore, QtWidgets
-from src.controller.controllers import LoadImageW, LoadTextW, Widget, WidgetEnum
+from src.controller.controllers import (
+    BasicMorphoW,
+    LoadImageW,
+    LoadTextW,
+    Widget,
+    WidgetEnum,
+)
+from src.metadata.metadata import RIGHT_CLICK_MENU, WIDGET_NAME_DICT
 from src.model.main_model import MainModel
 from src.view.items import GraphLinkItem
 from src.view.main_view import GraphView, MainView, Menu
-
-WIDGET_NAME_DICT = {
-    "load:image": WidgetEnum.load_im,
-    "load:text": WidgetEnum.load_txt,
-}
-RIGHT_CLICK_MENU = {
-    "scene": {"load": {"image": {}, "text": {}}},
-    WidgetEnum.load_im: {"load:image": {}},
-    WidgetEnum.load_txt: {"load:text": {}},
-}
 
 
 def widget_factory(
     widget_name: WidgetEnum, widget_position, parent_list: list[Widget]
 ) -> Widget:
     if widget_name == WidgetEnum.load_im:
-        return LoadImageW(widget_name, widget_position, parent_list)
-    if widget_name == WidgetEnum.load_txt:
-        return LoadTextW(widget_name, widget_position, parent_list)
+        return LoadImageW(widget_name, widget_position)
+    elif widget_name == WidgetEnum.load_txt:
+        return LoadTextW(widget_name, widget_position)
+    elif widget_name == WidgetEnum.basic_morpho:
+        return BasicMorphoW(widget_name, widget_position, parent_list[0])
 
 
 class MainController:

@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
 class QRadioButtonGroup(QtWidgets.QButtonGroup):
@@ -10,3 +10,16 @@ class QRadioButtonGroup(QtWidgets.QButtonGroup):
         self.buttons[0].setChecked(True)
         for button in self.buttons:
             self.addButton(button)
+
+
+class QInteractiveImage(QtWidgets.QLabel):
+    double_clicked = QtCore.pyqtSignal()
+    scrolled = QtCore.pyqtSignal(int)
+
+    def mouseDoubleClickEvent(self, event):
+        self.double_clicked.emit()
+        return super().mouseDoubleClickEvent(event)
+
+    def wheelEvent(self, event):
+        self.scrolled.emit(1)
+        return super().wheelEvent(event)

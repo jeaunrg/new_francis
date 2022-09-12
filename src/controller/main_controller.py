@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
 from src.controller.controllers import (
     BasicMorphoW,
+    Load3dImageW,
     LoadImageW,
     LoadTextW,
     Widget,
@@ -17,10 +18,16 @@ def widget_factory(
 ) -> Widget:
     if widget_name == WidgetEnum.load_im:
         return LoadImageW(widget_name, widget_position)
+    elif widget_name == WidgetEnum.load_3d_im:
+        return Load3dImageW(widget_name, widget_position)
     elif widget_name == WidgetEnum.load_txt:
         return LoadTextW(widget_name, widget_position)
     elif widget_name == WidgetEnum.basic_morpho:
         return BasicMorphoW(widget_name, widget_position, parent_list[:1])
+    else:
+        raise Exception(
+            f"Missing condition in widget_factory for widget_name={widget_name}"
+        )
 
 
 class MainController:

@@ -1,12 +1,13 @@
 from abc import abstractmethod
 from typing import Union
 
-import numpy as np
-from PyQt5 import QtCore, QtGui
-from src.controller.utils import browse_path, qimage_from_array, raise_exception
+from PyQt5 import QtCore
+from src.controller.mixin import Output2dImageMixin, Output3dImageMixin
+from src.controller.utils import browse_path, raise_exception
 from src.metadata.metadata import WidgetEnum
 from src.model.models import (
     BasicMorphoWM,
+    Load3dImageWM,
     LoadFileWM,
     LoadImageWM,
     LoadTextWM,
@@ -49,24 +50,12 @@ class Widget:
     def get_view_input(self) -> dict:
         pass
 
+    def get_view_output(self):
+        return self.output
+
     @abstractmethod
     def set_view_output(self, output):
         pass
-
-
-class OutputImageMixin:
-    def set_view_output(self, output: Union[np.ndarray, Exception]):
-        if isinstance(output, Exception):
-            return raise_exception(output)
-        qimage = qimage_from_array(output)
-        if qimage is None:
-            message = (
-                f"Image format not known. shape={output.shape}, dtype={output.dtype}"
-            )
-            return raise_exception(Exception(message))
-        pixmap = QtGui.QPixmap(qimage)
-        pixmap = pixmap.scaledToWidth(300, QtCore.Qt.FastTransformation)
-        self.view.image.setPixmap(pixmap)
 
 
 class LoadFileW(Widget):
@@ -87,8 +76,13 @@ class LoadFileW(Widget):
         return {"file_path": self.view.path.text()}
 
 
-class LoadImageW(OutputImageMixin, LoadFileW):
+class LoadImageW(Output2dImageMixin, LoadFileW):
     model_class = LoadImageWM
+    view_class = LoadImageWV
+
+
+class Load3dImageW(Output3dImageMixin, LoadFileW):
+    model_class = Load3dImageWM
     view_class = LoadImageWV
 
 
@@ -102,13 +96,13 @@ class LoadTextW(LoadFileW):
         self.view.text.setText(output)
 
 
-class BasicMorphoW(OutputImageMixin, Widget):
+class BasicMorphoW(Output3dImageMixin, Widget):
     model_class = BasicMorphoWM
     view_class = BasicMorphoWV
 
     def get_view_input(self) -> dict:
         return {
-            "im": self.parent_list[0].output,
+            "im": self.parent_list[0].get_view_output(),
             "operation": self.view.operations.checkedButton().text(),
             "size": self.view.size.value(),
             "is_round_shape": self.view.is_round_shape.isChecked(),

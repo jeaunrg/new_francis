@@ -1,10 +1,12 @@
 import os
 from abc import abstractmethod
 
+import nibabel as nib
 import numpy as np
 from PIL import Image
 from skimage import morphology
 from src.metadata.metadata import OPERATION_DICT
+from src.model.mixin import ImageOutputMixin
 
 
 class WidgetModel:
@@ -27,10 +29,10 @@ class LoadFileWM(WidgetModel):
         _, ext = os.path.splitext(file_path)
         if not os.path.isfile(file_path):
             return Exception(f"'{file_path}' is not a file")
-        if ext.lower() not in self.accepted_extensions:
-            return Exception(
-                "Accepted files are " + ", ".join(self.accepted_extensions)
-            )
+        for ext in self.accepted_extensions:
+            if file_path.lower().endswith(ext):
+                return
+        return Exception("Accepted files are " + ", ".join(self.accepted_extensions))
 
     @abstractmethod
     def load(self, file_path: str):
@@ -46,6 +48,15 @@ class LoadImageWM(LoadFileWM):
         return arr
 
 
+class Load3dImageWM(ImageOutputMixin, LoadFileWM):
+    accepted_extensions = [".nii", ".nii.gz"]
+
+    def load(self, file_path: str) -> np.ndarray:
+        im = nib.load(file_path)
+        arr = im.get_fdata()
+        return self.downgrade_raw_array(arr)
+
+
 class LoadTextWM(LoadFileWM):
     accepted_extensions = [".txt"]
 
@@ -56,7 +67,7 @@ class LoadTextWM(LoadFileWM):
         return text
 
 
-class BasicMorphoWM(WidgetModel):
+class BasicMorphoWM(ImageOutputMixin, WidgetModel):
     def _get_selem(self, shape, size: int, is_round_shape: bool):
         if len(shape) == 2:
             selem = (
@@ -82,7 +93,8 @@ class BasicMorphoWM(WidgetModel):
         if isinstance(im, Exception):
             return Exception("Wrong parent output.")
         elif size == 0:
-            return im
+            return self.downgrade_raw_array(im)
         selem = self._get_selem(im.shape, size, is_round_shape)
         function = OPERATION_DICT["morpho:basic"].get(operation)
-        return function(im, selem)
+        im = function(im, selem)
+        return self.downgrade_raw_array(im)

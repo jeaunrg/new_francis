@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 from PyQt5 import QtCore, QtWidgets
 from src.metadata.metadata import OPERATION_DICT
-from src.view.utils import QRadioButtonGroup
+from src.view.utils import QInteractiveImage, QRadioButtonGroup
 
 
 class WidgetView(QtWidgets.QWidget):
@@ -75,7 +75,7 @@ class LoadFileWV(WidgetView):
 class LoadImageWV(LoadFileWV):
     def make_widgets(self):
         super().make_widgets()
-        self.image = QtWidgets.QLabel()
+        self.image = QInteractiveImage()
 
     def make_grid_dict(self) -> dict[QtWidgets.QWidget, list[int]]:
         grid_dict = super().make_grid_dict()
@@ -101,7 +101,7 @@ class BasicMorphoWV(WidgetView):
         self.operations = QRadioButtonGroup(OPERATION_DICT["morpho:basic"].keys())
         self.size = QtWidgets.QSpinBox()
         self.is_round_shape = QtWidgets.QCheckBox("round shape")
-        self.image = QtWidgets.QLabel()
+        self.image = QInteractiveImage()
 
     def make_grid_dict(self) -> dict[QtWidgets.QWidget, list[int]]:
         grid_dict = {}

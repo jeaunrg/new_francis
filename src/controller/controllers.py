@@ -43,7 +43,6 @@ class Widget:
     def submit(self):
         view_input_dict = self.get_view_input()
         self.output = self.model.compute(**view_input_dict)
-        print(self.output)
         self.set_view_output(self.output)
 
     @abstractmethod

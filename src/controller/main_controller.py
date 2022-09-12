@@ -20,7 +20,7 @@ def widget_factory(
     elif widget_name == WidgetEnum.load_txt:
         return LoadTextW(widget_name, widget_position)
     elif widget_name == WidgetEnum.basic_morpho:
-        return BasicMorphoW(widget_name, widget_position, parent_list[0])
+        return BasicMorphoW(widget_name, widget_position, parent_list[:1])
 
 
 class MainController:

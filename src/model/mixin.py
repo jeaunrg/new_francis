@@ -1,29 +1,37 @@
 import pickle
+import sys
 
 import numpy as np
+from skimage.measure import block_reduce
 
 
 class OutputImageMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.is_downgraded = False
+        self.is_downsized = False
         self.path = "tmp.pkl"
 
-    def downgrade_raw_array(self, raw_arr: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def get_block_size(ratio, ndim):
+        block_size = int(ratio ** (1 / ndim))
+        return tuple([block_size] * ndim)
+
+    def downsize_raw_array(self, raw_arr: np.ndarray) -> np.ndarray:
         """return downgraded data"""
-        max_size = 10
-        self.is_downgraded = False
-        if raw_arr.size > max_size:
+        max_size = 1000000
+        self.is_downsized = False
+        ratio = sys.getsizeof(raw_arr) / max_size
+        print(ratio, ratio > 1, sys.getsizeof(raw_arr), raw_arr.shape, raw_arr.dtype)
+        if ratio > 1:
             with open(self.path, "wb") as f:
                 pickle.dump(raw_arr, f)
-            self.is_downgraded = True
-            return raw_arr.astype(np.uint8)
+            self.is_downsized = True
+            blok_size = OutputImageMixin.get_block_size(ratio, raw_arr.ndim)
+            arr = block_reduce(raw_arr, blok_size, func=np.mean).astype(np.uint8)
+            return arr
         return raw_arr
 
-    def get_view_output(self):
-        """return"""
-        if self.is_downgraded:
+    def get_raw_array(self):
+        if self.is_downsized:
             with open(self.path, "rb") as f:
                 return pickle.load(f)
-        else:
-            super().get_view_output()

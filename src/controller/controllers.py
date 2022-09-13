@@ -8,7 +8,6 @@ from src.metadata.metadata import WidgetEnum
 from src.model.models import (
     BasicMorpho2dWM,
     BasicMorpho3dWM,
-    BasicMorphoWM,
     Load2dImageWM,
     Load3dImageWM,
     LoadFileWM,
@@ -97,12 +96,11 @@ class LoadTextW(OutputTextMixin, LoadFileW):
 
 
 class BasicMorphoW(Widget):
-    model_class = BasicMorphoWM
     view_class = BasicMorphoWV
 
     def get_view_input(self) -> dict:
         return {
-            "im": self.parent_list[0].get_view_output(),
+            "arr": self.parent_list[0].get_view_output(),
             "operation": self.view.operations.checkedButton().text(),
             "size": self.view.size.value(),
             "is_round_shape": self.view.is_round_shape.isChecked(),
@@ -111,7 +109,9 @@ class BasicMorphoW(Widget):
 
 class BasicMorpho2dW(Output2dImageMixin, BasicMorphoW):
     model_class = BasicMorpho2dWM
+    view_class = BasicMorphoWV
 
 
 class BasicMorpho3dW(Output3dImageMixin, BasicMorphoW):
     model_class = BasicMorpho3dWM
+    view_class = BasicMorphoWV

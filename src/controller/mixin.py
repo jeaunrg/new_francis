@@ -6,6 +6,11 @@ from src.controller.utils import qimage_from_array, raise_exception
 
 
 class Output2dImageMixin:
+    def get_view_output(self):
+        if self.model.is_downsized:
+            return self.model.get_raw_array()
+        return self.output
+
     def set_view_output(self, output: Union[np.ndarray, Exception]):
         if isinstance(output, Exception):
             return raise_exception(output)

@@ -11,7 +11,7 @@ from src.model.mixin import OutputImageMixin
 
 class WidgetModel:
     @abstractmethod
-    def compute(self, view_input_dict: dict):
+    def compute(self, *args, **kwargs):
         pass
 
 
@@ -22,8 +22,7 @@ class LoadFileWM(WidgetModel):
         exception = self.check_path(file_path)
         if exception is not None:
             return exception
-        else:
-            return self.load(file_path)
+        return self.load(file_path)
 
     def check_path(self, file_path: str) -> Exception or None:
         _, ext = os.path.splitext(file_path)
@@ -39,22 +38,23 @@ class LoadFileWM(WidgetModel):
         pass
 
 
-class Load2dImageWM(LoadFileWM):
+class Load2dImageWM(OutputImageMixin, LoadFileWM):
     accepted_extensions = [".png", ".jpg", ".jpeg"]
 
     def load(self, file_path: str) -> np.ndarray:
         im = Image.open(file_path)
         arr = np.array(im)
-        return arr
+        return self.downsize_raw_array(arr)
 
 
 class Load3dImageWM(OutputImageMixin, LoadFileWM):
     accepted_extensions = [".nii", ".nii.gz"]
 
     def load(self, file_path: str) -> np.ndarray:
+        print("compute3d")
         im = nib.load(file_path)
         arr = im.get_fdata()
-        return self.downgrade_raw_array(arr)
+        return self.downsize_raw_array(arr)
 
 
 class LoadTextWM(LoadFileWM):
@@ -67,20 +67,19 @@ class LoadTextWM(LoadFileWM):
         return text
 
 
-class BasicMorphoWM(OutputImageMixin, WidgetModel):
-    def compute(self, im: np.ndarray or Exception):
-        return self.downgrade_raw_array(im)
+class BasicMorphoWM(WidgetModel):
+    pass
 
 
-class BasicMorpho2dWM(BasicMorphoWM):
+class BasicMorpho2dWM(OutputImageMixin, BasicMorphoWM):
     def compute(
         self,
-        im: np.ndarray or Exception,
+        arr: np.ndarray or Exception,
         size: int,
         operation: str,
         is_round_shape: bool,
     ):
-        if isinstance(im, Exception):
+        if isinstance(arr, Exception):
             return Exception("Wrong parent output.")
         elif size != 0:
             function = OPERATION_DICT["morpho:basic"].get(operation)
@@ -89,24 +88,24 @@ class BasicMorpho2dWM(BasicMorphoWM):
                 if is_round_shape
                 else morphology.square(size * 2 + 1)
             )
-            if im.ndim == 3:
+            if arr.ndim == 3:
                 # in case of rgb or rgba images
-                for i in range(im.shape[2]):
-                    im[:, :, i] = function(im[:, :, i], selem)
-            elif im.ndim == 2:
-                im = function(im, selem)
-        return super().compute(im)
+                for i in range(arr.shape[2]):
+                    arr[:, :, i] = function(arr[:, :, i], selem)
+            elif arr.ndim == 2:
+                arr = function(arr, selem)
+        return self.downsize_raw_array(arr)
 
 
-class BasicMorpho3dWM(BasicMorphoWM):
+class BasicMorpho3dWM(OutputImageMixin, BasicMorphoWM):
     def compute(
         self,
-        im: np.ndarray or Exception,
+        arr: np.ndarray or Exception,
         size: int,
         operation: str,
         is_round_shape: bool,
     ):
-        if isinstance(im, Exception):
+        if isinstance(arr, Exception):
             return Exception("Wrong parent output.")
         elif size != 0:
             function = OPERATION_DICT["morpho:basic"].get(operation)
@@ -115,5 +114,5 @@ class BasicMorpho3dWM(BasicMorphoWM):
                 if is_round_shape
                 else morphology.cube(size * 2 + 1)
             )
-            im = function(im, selem)
-        return super().compute(im)
+            arr = function(arr, selem)
+        return self.downsize_raw_array(arr)

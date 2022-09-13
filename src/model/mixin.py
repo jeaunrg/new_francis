@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 
 
-class ImageOutputMixin:
+class OutputImageMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.is_downgraded = False

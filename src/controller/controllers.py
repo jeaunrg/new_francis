@@ -2,19 +2,23 @@ from abc import abstractmethod
 from typing import Union
 
 from PyQt5 import QtCore
-from src.controller.mixin import Output2dImageMixin, Output3dImageMixin
-from src.controller.utils import browse_path, raise_exception
+from src.controller.mixin import Output2dImageMixin, Output3dImageMixin, OutputTextMixin
+from src.controller.utils import browse_path
 from src.metadata.metadata import WidgetEnum
 from src.model.models import (
+    BasicMorpho2dWM,
+    BasicMorpho3dWM,
     BasicMorphoWM,
+    Load2dImageWM,
     Load3dImageWM,
     LoadFileWM,
-    LoadImageWM,
     LoadTextWM,
     WidgetModel,
 )
 from src.view.items import WidgetItem
 from src.view.views import (
+    BasicMorpho2dWV,
+    BasicMorpho3dWV,
     BasicMorphoWV,
     LoadFileWV,
     LoadImageWV,
@@ -32,6 +36,9 @@ class Widget:
     ):
         self.name = name
         self.parent_list = parent_list
+        for parent in parent_list:
+            parent.child_list.append(self)
+        self.child_list = []
         self.model = self.model_class()
         self.view = self.view_class()
         self.item = WidgetItem(self.view, position)
@@ -76,8 +83,8 @@ class LoadFileW(Widget):
         return {"file_path": self.view.path.text()}
 
 
-class LoadImageW(Output2dImageMixin, LoadFileW):
-    model_class = LoadImageWM
+class Load2dImageW(Output2dImageMixin, LoadFileW):
+    model_class = Load2dImageWM
     view_class = LoadImageWV
 
 
@@ -86,17 +93,12 @@ class Load3dImageW(Output3dImageMixin, LoadFileW):
     view_class = LoadImageWV
 
 
-class LoadTextW(LoadFileW):
+class LoadTextW(OutputTextMixin, LoadFileW):
     model_class = LoadTextWM
     view_class = LoadTextWV
 
-    def set_view_output(self, output: Union[str, Exception]):
-        if isinstance(output, Exception):
-            return raise_exception(output)
-        self.view.text.setText(output)
 
-
-class BasicMorphoW(Output3dImageMixin, Widget):
+class BasicMorphoW(Widget):
     model_class = BasicMorphoWM
     view_class = BasicMorphoWV
 
@@ -107,3 +109,13 @@ class BasicMorphoW(Output3dImageMixin, Widget):
             "size": self.view.size.value(),
             "is_round_shape": self.view.is_round_shape.isChecked(),
         }
+
+
+class BasicMorpho2dW(Output2dImageMixin, BasicMorphoW):
+    model_class = BasicMorpho2dWM
+    view_class = BasicMorpho2dWV
+
+
+class BasicMorpho3dW(Output3dImageMixin, BasicMorphoW):
+    model_class = BasicMorpho3dWM
+    view_class = BasicMorpho3dWV

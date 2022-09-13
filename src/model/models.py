@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from skimage import morphology
 from src.metadata.metadata import OPERATION_DICT
-from src.model.mixin import ImageOutputMixin
+from src.model.mixin import OutputImageMixin
 
 
 class WidgetModel:
@@ -39,7 +39,7 @@ class LoadFileWM(WidgetModel):
         pass
 
 
-class LoadImageWM(LoadFileWM):
+class Load2dImageWM(LoadFileWM):
     accepted_extensions = [".png", ".jpg", ".jpeg"]
 
     def load(self, file_path: str) -> np.ndarray:
@@ -48,7 +48,7 @@ class LoadImageWM(LoadFileWM):
         return arr
 
 
-class Load3dImageWM(ImageOutputMixin, LoadFileWM):
+class Load3dImageWM(OutputImageMixin, LoadFileWM):
     accepted_extensions = [".nii", ".nii.gz"]
 
     def load(self, file_path: str) -> np.ndarray:
@@ -67,22 +67,11 @@ class LoadTextWM(LoadFileWM):
         return text
 
 
-class BasicMorphoWM(ImageOutputMixin, WidgetModel):
-    def _get_selem(self, shape, size: int, is_round_shape: bool):
-        if len(shape) == 2:
-            selem = (
-                morphology.disk(size)
-                if is_round_shape
-                else morphology.square(size * 2 + 1)
-            )
-        elif len(shape) == 3:
-            selem = (
-                morphology.ball(size)
-                if is_round_shape
-                else morphology.cube(size * 2 + 1)
-            )
-        return selem
+class BasicMorphoWM(WidgetModel):
+    pass
 
+
+class BasicMorpho2dWM(OutputImageMixin, BasicMorphoWM):
     def compute(
         self,
         im: np.ndarray or Exception,
@@ -94,7 +83,34 @@ class BasicMorphoWM(ImageOutputMixin, WidgetModel):
             return Exception("Wrong parent output.")
         elif size == 0:
             return self.downgrade_raw_array(im)
-        selem = self._get_selem(im.shape, size, is_round_shape)
         function = OPERATION_DICT["morpho:basic"].get(operation)
+        selem = (
+            morphology.disk(size) if is_round_shape else morphology.square(size * 2 + 1)
+        )
+        if im.ndim == 3:
+            # in case of rgb or rgba images
+            for i in range(im.shape[2]):
+                im[:, :, i] = function(im[:, :, i], selem)
+        elif im.ndim == 2:
+            im = function(im, selem)
+        return self.downgrade_raw_array(im)
+
+
+class BasicMorpho3dWM(OutputImageMixin, BasicMorphoWM):
+    def compute(
+        self,
+        im: np.ndarray or Exception,
+        size: int,
+        operation: str,
+        is_round_shape: bool,
+    ):
+        if isinstance(im, Exception):
+            return Exception("Wrong parent output.")
+        elif size == 0:
+            return self.downgrade_raw_array(im)
+        function = OPERATION_DICT["morpho:basic"].get(operation)
+        selem = (
+            morphology.ball(size) if is_round_shape else morphology.cube(size * 2 + 1)
+        )
         im = function(im, selem)
         return self.downgrade_raw_array(im)

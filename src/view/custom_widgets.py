@@ -21,5 +21,8 @@ class QInteractiveImage(QtWidgets.QLabel):
         return super().mouseDoubleClickEvent(event)
 
     def wheelEvent(self, event):
-        self.scrolled.emit(1)
+        if event.angleDelta().y() > 0:
+            self.scrolled.emit(-1)
+        else:
+            self.scrolled.emit(1)
         return super().wheelEvent(event)

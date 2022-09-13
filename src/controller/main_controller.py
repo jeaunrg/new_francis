@@ -1,8 +1,9 @@
 from PyQt5 import QtCore, QtWidgets
 from src.controller.controllers import (
-    BasicMorphoW,
+    BasicMorpho2dW,
+    BasicMorpho3dW,
+    Load2dImageW,
     Load3dImageW,
-    LoadImageW,
     LoadTextW,
     Widget,
     WidgetEnum,
@@ -17,13 +18,16 @@ def widget_factory(
     widget_name: WidgetEnum, widget_position, parent_list: list[Widget]
 ) -> Widget:
     if widget_name == WidgetEnum.load_im:
-        return LoadImageW(widget_name, widget_position)
+        return Load2dImageW(widget_name, widget_position)
     elif widget_name == WidgetEnum.load_3d_im:
         return Load3dImageW(widget_name, widget_position)
     elif widget_name == WidgetEnum.load_txt:
         return LoadTextW(widget_name, widget_position)
     elif widget_name == WidgetEnum.basic_morpho:
-        return BasicMorphoW(widget_name, widget_position, parent_list[:1])
+        return BasicMorpho2dW(widget_name, widget_position, parent_list[:1])
+    elif widget_name == WidgetEnum.basic_morpho_3d:
+        return BasicMorpho3dW(widget_name, widget_position, parent_list[:1])
+
     else:
         raise Exception(
             f"Missing condition in widget_factory for widget_name={widget_name}"

@@ -8,6 +8,7 @@ class WidgetEnum(str, Enum):
     load_3d_im = "load_3d_im"
     load_txt = "load_txt"
     basic_morpho = "basic_morpho"
+    basic_morpho_3d = "basic_morpho_3d"
 
 
 OPERATION_DICT = {
@@ -26,12 +27,13 @@ WIDGET_NAME_DICT = {
     "load:3dimage": WidgetEnum.load_3d_im,
     "load:text": WidgetEnum.load_txt,
     "morpho:basic": WidgetEnum.basic_morpho,
+    "morpho3d:basic": WidgetEnum.basic_morpho_3d,
 }
 
 RIGHT_CLICK_MENU = {
     "scene": {"load": {"image": {}, "3dimage": {}, "text": {}}},
     WidgetEnum.load_im: {"morpho:basic": {}},
-    WidgetEnum.load_3d_im: {"morpho:basic": {}},
+    WidgetEnum.load_3d_im: {"morpho3d:basic": {}},
     WidgetEnum.load_txt: {},
     WidgetEnum.basic_morpho: {},
 }

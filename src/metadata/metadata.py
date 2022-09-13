@@ -35,5 +35,6 @@ RIGHT_CLICK_MENU = {
     WidgetEnum.load_im: {"morpho:basic": {}},
     WidgetEnum.load_3d_im: {"morpho3d:basic": {}},
     WidgetEnum.load_txt: {},
-    WidgetEnum.basic_morpho: {},
+    WidgetEnum.basic_morpho: {"morpho:basic": {}},
+    WidgetEnum.basic_morpho_3d: {"morpho3d:basic": {}},
 }

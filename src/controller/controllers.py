@@ -17,8 +17,6 @@ from src.model.models import (
 )
 from src.view.items import WidgetItem
 from src.view.views import (
-    BasicMorpho2dWV,
-    BasicMorpho3dWV,
     BasicMorphoWV,
     LoadFileWV,
     LoadImageWV,
@@ -113,9 +111,7 @@ class BasicMorphoW(Widget):
 
 class BasicMorpho2dW(Output2dImageMixin, BasicMorphoW):
     model_class = BasicMorpho2dWM
-    view_class = BasicMorpho2dWV
 
 
 class BasicMorpho3dW(Output3dImageMixin, BasicMorphoW):
     model_class = BasicMorpho3dWM
-    view_class = BasicMorpho3dWV

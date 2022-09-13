@@ -67,11 +67,12 @@ class LoadTextWM(LoadFileWM):
         return text
 
 
-class BasicMorphoWM(WidgetModel):
-    pass
+class BasicMorphoWM(OutputImageMixin, WidgetModel):
+    def compute(self, im: np.ndarray or Exception):
+        return self.downgrade_raw_array(im)
 
 
-class BasicMorpho2dWM(OutputImageMixin, BasicMorphoWM):
+class BasicMorpho2dWM(BasicMorphoWM):
     def compute(
         self,
         im: np.ndarray or Exception,
@@ -81,36 +82,38 @@ class BasicMorpho2dWM(OutputImageMixin, BasicMorphoWM):
     ):
         if isinstance(im, Exception):
             return Exception("Wrong parent output.")
-        elif size == 0:
-            return self.downgrade_raw_array(im)
-        function = OPERATION_DICT["morpho:basic"].get(operation)
-        selem = (
-            morphology.disk(size) if is_round_shape else morphology.square(size * 2 + 1)
-        )
-        if im.ndim == 3:
-            # in case of rgb or rgba images
-            for i in range(im.shape[2]):
-                im[:, :, i] = function(im[:, :, i], selem)
-        elif im.ndim == 2:
+        elif size != 0:
+            function = OPERATION_DICT["morpho:basic"].get(operation)
+            selem = (
+                morphology.disk(size)
+                if is_round_shape
+                else morphology.square(size * 2 + 1)
+            )
+            if im.ndim == 3:
+                # in case of rgb or rgba images
+                for i in range(im.shape[2]):
+                    im[:, :, i] = function(im[:, :, i], selem)
+            elif im.ndim == 2:
+                im = function(im, selem)
+        return super().compute(im)
+
+
+class BasicMorpho3dWM(BasicMorphoWM):
+    def compute(
+        self,
+        im: np.ndarray or Exception,
+        size: int,
+        operation: str,
+        is_round_shape: bool,
+    ):
+        if isinstance(im, Exception):
+            return Exception("Wrong parent output.")
+        elif size != 0:
+            function = OPERATION_DICT["morpho:basic"].get(operation)
+            selem = (
+                morphology.ball(size)
+                if is_round_shape
+                else morphology.cube(size * 2 + 1)
+            )
             im = function(im, selem)
-        return self.downgrade_raw_array(im)
-
-
-class BasicMorpho3dWM(OutputImageMixin, BasicMorphoWM):
-    def compute(
-        self,
-        im: np.ndarray or Exception,
-        size: int,
-        operation: str,
-        is_round_shape: bool,
-    ):
-        if isinstance(im, Exception):
-            return Exception("Wrong parent output.")
-        elif size == 0:
-            return self.downgrade_raw_array(im)
-        function = OPERATION_DICT["morpho:basic"].get(operation)
-        selem = (
-            morphology.ball(size) if is_round_shape else morphology.cube(size * 2 + 1)
-        )
-        im = function(im, selem)
-        return self.downgrade_raw_array(im)
+        return super().compute(im)

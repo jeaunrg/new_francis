@@ -2,6 +2,7 @@ from typing import Union
 
 import numpy as np
 from PyQt5 import QtGui, QtWidgets
+from src.metadata.metadata import DATA_DIR
 
 
 def _get_arr_infos(
@@ -36,9 +37,7 @@ def make_qimage(arr: np.ndarray) -> QtGui.QImage or None:
     return qimage
 
 
-def browse_path(
-    data_dir: str or None = None, parent: QtWidgets.QWidget or None = None
-) -> str:
+def browse_path(parent: QtWidgets.QWidget or None = None) -> str:
     """
     open a browse window to select a file and update path widget
     """
@@ -46,7 +45,7 @@ def browse_path(
     filename, ok = dialog.getOpenFileName(
         parent,
         "Select a file...",
-        data_dir,
+        DATA_DIR,
         filter="*.nii.gz *.nii *.png *.jpg *.txt *.pkl",
     )
     if not ok:

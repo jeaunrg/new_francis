@@ -32,7 +32,7 @@ class WidgetView(QtWidgets.QWidget):
         return grid_widget
 
     def is_selected(self):
-        return True
+        return False
 
     def enterEvent(self, event):
         self.focused.emit(True)

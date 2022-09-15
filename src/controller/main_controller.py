@@ -110,13 +110,17 @@ class GraphController:
 
     def close(self):
         for parent_widget in self.parent_widget_list:
-            parent_widget.delete()
+            reply = parent_widget.view.popup_dialog("close_widget")
+            if reply == QtWidgets.QMessageBox.Yes:
+                parent_widget.delete()
 
 
 class GraphLinkController:
     def __init__(self, parent: Widget, child: Widget):
         self.parent = parent
         self.child = child
+        self.parent.link_list.append(self)
+        self.child.link_list.append(self)
         self.item = GraphLinkItem()
         self.make_connections()
 
@@ -127,3 +131,8 @@ class GraphLinkController:
         self.child.view.position_changed.connect(
             lambda: self.item.draw(self.parent.item, self.child.item)
         )
+
+    def delete(self):
+        self.item.delete()
+        self.parent.link_list.remove(self)
+        self.child.link_list.remove(self)

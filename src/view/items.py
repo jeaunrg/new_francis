@@ -124,3 +124,6 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         p23 = p2 + normal * self.arrow_width - unit * self.arrow_len
         p24 = p2 - normal * self.arrow_width - unit * self.arrow_len
         self.setPolygon(QtGui.QPolygonF([p11, p21, p23, p2, p24, p22, p12, p11]))
+
+    def delete(self):
+        self.scene().removeItem(self)

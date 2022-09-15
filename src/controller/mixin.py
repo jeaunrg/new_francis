@@ -17,6 +17,11 @@ class Output2dImageMixin:
 
 
 class Output3dImageMixin(Output2dImageMixin):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.viewpoint = 0
+        self.sections = [0, 0, 0]
+
     def _get_related_widgets(self, widget, widget_list: list = []):
         for w in widget.parent_list + widget.child_list:
             if w != self and w not in widget_list:
@@ -75,7 +80,7 @@ class Output3dImageMixin(Output2dImageMixin):
             self.update_viewpoint(value=w.viewpoint)
 
     def set_view_output(self, output: Union[np.ndarray, Exception] = None):
-        if not isinstance(output, Exception):
+        if not isinstance(self.output, Exception):
             if isinstance(output, np.ndarray):
                 self.init_sections_and_viewpoint()
             if self.viewpoint == 0:

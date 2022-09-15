@@ -35,6 +35,7 @@ class Widget:
         for parent in parent_list:
             parent.child_list.append(self)
         self.child_list = []
+        self.link_list = []
         self.model = self.model_class(**self.inherited_model_attr)
         self.view = self.view_class()
         self.item = WidgetItem(self.view, position)
@@ -74,12 +75,14 @@ class Widget:
         pass
 
     def delete(self):
-        reply = self.view.popup_dialog("close_widget")
-        if reply == QtWidgets.QMessageBox.Yes:
-            for child in self.child_list:
-                child.delete()
-            self.item.delete()
-            self.model.delete()
+        for child in self.child_list:
+            child.delete()
+        for link in self.link_list:
+            link.delete()
+        for parent in self.parent_list:
+            parent.child_list.remove(self)
+        self.item.delete()
+        self.model.delete()
 
 
 class LoadFileW(Widget):

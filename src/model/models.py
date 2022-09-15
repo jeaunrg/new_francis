@@ -1,4 +1,5 @@
 import os
+import sys
 from abc import abstractmethod
 
 import nibabel as nib
@@ -81,19 +82,16 @@ class BasicMorpho2dWM(OutputImageMixin, BasicMorphoWM):
     ):
         if isinstance(arr, Exception):
             return Exception("Wrong parent output.")
-        elif size != 0:
-            function = OPERATION_DICT["morpho:basic"].get(operation)
-            selem = (
-                morphology.disk(size)
-                if is_round_shape
-                else morphology.square(size * 2 + 1)
-            )
-            if arr.ndim == 3:
-                # in case of rgb or rgba images
-                for i in range(arr.shape[2]):
-                    arr[:, :, i] = function(arr[:, :, i], selem)
-            elif arr.ndim == 2:
-                arr = function(arr, selem)
+        function = OPERATION_DICT["morpho:basic"].get(operation)
+        selem = (
+            morphology.disk(size) if is_round_shape else morphology.square(size * 2 + 1)
+        )
+        if arr.ndim == 3:
+            # in case of rgb or rgba images
+            for i in range(arr.shape[2]):
+                arr[:, :, i] = function(arr[:, :, i], selem)
+        elif arr.ndim == 2:
+            arr = function(arr, selem)
         return self.downsize_raw_array(arr)
 
 
@@ -107,12 +105,9 @@ class BasicMorpho3dWM(OutputImageMixin, BasicMorphoWM):
     ):
         if isinstance(arr, Exception):
             return Exception("Wrong parent output.")
-        elif size != 0:
-            function = OPERATION_DICT["morpho:basic"].get(operation)
-            selem = (
-                morphology.ball(size)
-                if is_round_shape
-                else morphology.cube(size * 2 + 1)
-            )
-            arr = function(arr, selem)
+        function = OPERATION_DICT["morpho:basic"].get(operation)
+        selem = (
+            morphology.ball(size) if is_round_shape else morphology.cube(size * 2 + 1)
+        )
+        arr = function(arr, selem)
         return self.downsize_raw_array(arr)

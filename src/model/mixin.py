@@ -9,7 +9,7 @@ class OutputImageMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.is_downsized = False
-        self.path = "tmp.pkl"
+        self.path = "tmp.npy"
 
     @staticmethod
     def get_block_size(ratio, ndim):
@@ -20,11 +20,10 @@ class OutputImageMixin:
         """return downgraded data"""
         max_size = 1000000
         self.is_downsized = False
-        ratio = sys.getsizeof(raw_arr) / max_size
-        print(ratio, ratio > 1, sys.getsizeof(raw_arr), raw_arr.shape, raw_arr.dtype)
+        ratio = raw_arr.nbytes / max_size
+        print(raw_arr.nbytes, raw_arr.shape, raw_arr.dtype)
         if ratio > 1:
-            with open(self.path, "wb") as f:
-                pickle.dump(raw_arr, f)
+            np.save(self.path, raw_arr)
             self.is_downsized = True
             blok_size = OutputImageMixin.get_block_size(ratio, raw_arr.ndim)
             arr = block_reduce(raw_arr, blok_size, func=np.mean).astype(np.uint8)
@@ -33,5 +32,4 @@ class OutputImageMixin:
 
     def get_raw_array(self):
         if self.is_downsized:
-            with open(self.path, "rb") as f:
-                return pickle.load(f)
+            return np.load(self.path)

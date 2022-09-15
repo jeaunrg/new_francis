@@ -56,7 +56,10 @@ class Widget:
 
     def submit(self):
         view_input_dict = self.get_view_input()
-        self.output = self.model.compute(**view_input_dict)
+        try:
+            self.output = self.model.compute(**view_input_dict)
+        except Exception as e:
+            self.output = Exception("Wrong parent output.", e)
         self.set_view_output(self.output)
 
     @abstractmethod

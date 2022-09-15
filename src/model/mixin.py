@@ -6,11 +6,16 @@ from skimage.measure import block_reduce
 
 
 class OutputImageMixin:
-    def __init__(self, block_size=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.block_size = block_size
+        self.block_size = None
         self.is_downsized = False
         self.path = str(uuid.uuid4()) + ".npy"
+
+    def get_heritage(self) -> dict:
+        attributes = super().get_heritage()
+        attributes["block_size"] = self.block_size
+        return attributes
 
     def _downsample_raw_array(self, arr: np.ndarray) -> np.ndarray:
         self.is_downsized = False
@@ -35,11 +40,6 @@ class OutputImageMixin:
             return output
 
         return wrapper
-
-    def get_heritage(self) -> dict:
-        attributes = super().get_heritage()
-        attributes["block_size"] = self.block_size
-        return attributes
 
     def get_raw_array(self):
         return np.load(self.path)

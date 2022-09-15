@@ -5,6 +5,12 @@ from src.metadata.func import raise_exception
 
 
 class Output2dImageMixin:
+    def submit(self):
+        if len(self.parent_list) == 0:
+            # reset block_size to 0 for primary widgets
+            self.model.block_size = None
+        super().submit()
+
     def get_view_output(self):
         if self.model.is_downsized:
             return self.model.get_raw_array()

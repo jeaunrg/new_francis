@@ -11,6 +11,9 @@ from src.model.mixin import OutputImageMixin
 
 
 class WidgetModel:
+    def set_inherited_attr(self, **kwargs):
+        self.__dict__.update(kwargs)
+
     def get_heritage(self) -> dict:
         """attributes that children can inherits"""
         return {}

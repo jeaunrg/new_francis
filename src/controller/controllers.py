@@ -36,13 +36,12 @@ class Widget:
             parent.child_list.append(self)
         self.child_list = []
         self.link_list = []
-        self.model = self.model_class(**self.inherited_model_attr)
+        self.model = self.model_class()
         self.view = self.view_class()
         self.item = WidgetItem(self.view, position)
         self.output = Exception("No output yet.")
         self.make_connections()
 
-    @property
     def inherited_model_attr(self) -> dict:
         """model attributes which can be inherited from parent widget models"""
         inherited_attributes = {}
@@ -56,6 +55,7 @@ class Widget:
         self.view.button.clicked.connect(lambda: self.submit())
 
     def submit(self):
+        self.model.set_inherited_attr(**self.inherited_model_attr())
         view_input_dict = self.get_view_input()
         try:
             self.output = self.model.compute(**view_input_dict)

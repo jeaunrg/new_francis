@@ -1,14 +1,6 @@
-import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
-from src.view.views import WidgetView
-
-POPUPS = {
-    "close_scene": (
-        "Are you sure to close this scene ?",
-        QMessageBox.Yes | QMessageBox.No,
-    )
-}
+from src.metadata.metadata import POPUPS
 
 
 class MainView(QtWidgets.QMainWindow):
@@ -44,6 +36,7 @@ class GraphView(QtWidgets.QGraphicsView):
 
 class Menu(QtWidgets.QMenu):
     activated = QtCore.pyqtSignal(str)
+    closed = QtCore.pyqtSignal()
 
     def __init__(self, menu_dict: dict = {}):
         super().__init__()
@@ -53,6 +46,8 @@ class Menu(QtWidgets.QMenu):
         self.clear()
         for key, values in menu_dict.items():
             self._build_recursively(self, key, values, key)
+        close_action = self.addAction("close")
+        close_action.triggered.connect(lambda: self.closed.emit())
 
     def _build_recursively(
         self, menu: QtWidgets.QMenu, key: str, values: dict, activation_key: str

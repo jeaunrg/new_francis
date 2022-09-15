@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 from skimage import morphology
 from src.metadata.metadata import OPERATION_DICT
-from src.model.mixin import OutputModelMixin
+from src.model.mixin import OutputImageMixin
 
 
 class WidgetModel:
@@ -17,6 +17,9 @@ class WidgetModel:
 
     @abstractmethod
     def compute(self, *args, **kwargs):
+        pass
+
+    def delete(self):
         pass
 
 
@@ -43,19 +46,19 @@ class LoadFileWM(WidgetModel):
         pass
 
 
-class Load2dImageWM(OutputModelMixin, LoadFileWM):
+class Load2dImageWM(OutputImageMixin, LoadFileWM):
     accepted_extensions = [".png", ".jpg", ".jpeg"]
 
-    @OutputModelMixin.downsize
+    @OutputImageMixin.downsize
     def load(self, file_path: str) -> np.ndarray:
         im = Image.open(file_path)
         return np.array(im)
 
 
-class Load3dImageWM(OutputModelMixin, LoadFileWM):
+class Load3dImageWM(OutputImageMixin, LoadFileWM):
     accepted_extensions = [".nii", ".nii.gz"]
 
-    @OutputModelMixin.downsize
+    @OutputImageMixin.downsize
     def load(self, file_path: str) -> np.ndarray:
         im = nib.load(file_path)
         return im.get_fdata()
@@ -71,8 +74,8 @@ class LoadTextWM(LoadFileWM):
         return text
 
 
-class BasicMorpho2dWM(OutputModelMixin, WidgetModel):
-    @OutputModelMixin.downsize
+class BasicMorpho2dWM(OutputImageMixin, WidgetModel):
+    @OutputImageMixin.downsize
     def compute(
         self,
         arr: np.ndarray,
@@ -93,8 +96,8 @@ class BasicMorpho2dWM(OutputModelMixin, WidgetModel):
         return arr
 
 
-class BasicMorpho3dWM(OutputModelMixin, WidgetModel):
-    @OutputModelMixin.downsize
+class BasicMorpho3dWM(OutputImageMixin, WidgetModel):
+    @OutputImageMixin.downsize
     def compute(
         self,
         arr: np.ndarray or Exception,

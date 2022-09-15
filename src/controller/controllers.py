@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 from src.controller.mixin import Output2dImageMixin, Output3dImageMixin, OutputTextMixin
 from src.metadata.metadata import WidgetEnum
 from src.model.models import (
@@ -72,6 +72,14 @@ class Widget:
     @abstractmethod
     def set_view_output(self, output):
         pass
+
+    def delete(self):
+        reply = self.view.popup_dialog("close_widget")
+        if reply == QtWidgets.QMessageBox.Yes:
+            for child in self.child_list:
+                child.delete()
+            self.item.delete()
+            self.model.delete()
 
 
 class LoadFileW(Widget):

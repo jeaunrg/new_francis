@@ -69,6 +69,7 @@ class GraphController:
 
     def make_connections(self):
         self.view.right_clicked.connect(lambda position: self.open_menu(position))
+        self.menu.closed.connect(lambda: self.close())
         self.menu.activated.connect(
             lambda activation_key: self.add_widget(WIDGET_NAME_DICT[activation_key])
         )
@@ -106,6 +107,10 @@ class GraphController:
         for parent_widget in widget.parent_list:
             link = GraphLinkController(parent_widget, widget)
             self.view.scene().addItem(link.item)
+
+    def close(self):
+        for parent_widget in self.parent_widget_list:
+            parent_widget.delete()
 
 
 class GraphLinkController:

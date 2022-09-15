@@ -33,6 +33,10 @@ class WidgetItem(QtWidgets.QGraphicsRectItem):
             self.view.position_changed.emit()
         return super().itemChange(change, value)
 
+    def delete(self):
+        self.scene().removeItem(self.view.graphicsProxyWidget())
+        self.scene().removeItem(self)
+
 
 class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
     def __init__(self):

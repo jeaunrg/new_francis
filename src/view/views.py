@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
 from PyQt5 import QtCore, QtWidgets
-from src.metadata.metadata import OPERATION_DICT
+from PyQt5.QtWidgets import QMessageBox
+from src.metadata.metadata import OPERATION_DICT, POPUPS
 from src.view.custom_widgets import QInteractiveImage, QRadioButtonGroup
 
 
@@ -59,6 +60,10 @@ class WidgetView(QtWidgets.QWidget):
         }
         """
         pass
+
+    def popup_dialog(self, popup_key: str):
+        question, responses = POPUPS[popup_key]
+        return QMessageBox.question(self, "", question, responses)
 
 
 class LoadFileWV(WidgetView):

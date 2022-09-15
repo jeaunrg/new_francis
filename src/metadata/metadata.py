@@ -1,5 +1,6 @@
 from enum import Enum
 
+from PyQt5.QtWidgets import QMessageBox
 from skimage import morphology
 
 
@@ -39,4 +40,15 @@ RIGHT_CLICK_MENU = {
     WidgetEnum.load_txt: {},
     WidgetEnum.basic_morpho: {"morpho:basic": {}},
     WidgetEnum.basic_morpho_3d: {"morpho3d:basic": {}},
+}
+
+POPUPS = {
+    "close_scene": (
+        "Are you sure to close this scene ?",
+        QMessageBox.Yes | QMessageBox.No,
+    ),
+    "close_widget": (
+        "Are you sure to close this widget ?",
+        QMessageBox.Yes | QMessageBox.No,
+    ),
 }

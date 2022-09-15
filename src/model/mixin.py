@@ -1,10 +1,11 @@
+import os
 import uuid
 
 import numpy as np
 from skimage.measure import block_reduce
 
 
-class OutputModelMixin:
+class OutputImageMixin:
     def __init__(self, block_size=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.block_size = block_size
@@ -42,3 +43,7 @@ class OutputModelMixin:
 
     def get_raw_array(self):
         return np.load(self.path)
+
+    def delete(self):
+        if os.path.isfile(self.path):
+            os.remove(self.path)

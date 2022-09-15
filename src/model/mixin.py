@@ -1,35 +1,44 @@
-import pickle
-import sys
+import uuid
 
 import numpy as np
 from skimage.measure import block_reduce
 
 
 class OutputImageMixin:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, block_size=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.block_size = block_size
         self.is_downsized = False
-        self.path = "tmp.npy"
+        self.path = str(uuid.uuid4()) + ".npy"
 
-    @staticmethod
-    def get_block_size(ratio, ndim):
-        block_size = int(ratio ** (1 / ndim))
-        return tuple([block_size] * ndim)
+    def get_heritage(self) -> dict:
+        attributes = super().get_heritage()
+        attributes["block_size"] = self.block_size
+        return attributes
 
-    def downsize_raw_array(self, raw_arr: np.ndarray) -> np.ndarray:
-        """return downgraded data"""
-        max_size = 1000000
+    def downsample_raw_array(self, arr: np.ndarray) -> np.ndarray:
         self.is_downsized = False
-        ratio = raw_arr.nbytes / max_size
-        print(raw_arr.nbytes, raw_arr.shape, raw_arr.dtype)
-        if ratio > 1:
-            np.save(self.path, raw_arr)
-            self.is_downsized = True
-            blok_size = OutputImageMixin.get_block_size(ratio, raw_arr.ndim)
-            arr = block_reduce(raw_arr, blok_size, func=np.mean).astype(np.uint8)
-            return arr
-        return raw_arr
+        if self.block_size is None:
+            ratio = arr.nbytes / 1000000
+            if ratio > 1:
+                self.is_downsized = True
+                np.save(self.path, arr)
+                block_size = int(ratio ** (1 / arr.ndim))
+            else:
+                block_size = 1
+            self.block_size = tuple([block_size] * arr.ndim)
+        arr = block_reduce(arr, self.block_size, func=np.mean)
+        return arr
+
+    def downsize_output(f):
+        def wrapper(cls, *args, **kwargs):
+            output = f(cls, *args, **kwargs)
+            if isinstance(output, np.ndarray):
+                output = cls.downsample_raw_array(output)
+                output = output.astype(np.uint8)
+            return output
+
+        return wrapper
 
     def get_raw_array(self):
-        if self.is_downsized:
-            return np.load(self.path)
+        return np.load(self.path)

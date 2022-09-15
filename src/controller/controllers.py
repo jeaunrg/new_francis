@@ -35,11 +35,21 @@ class Widget:
         for parent in parent_list:
             parent.child_list.append(self)
         self.child_list = []
-        self.model = self.model_class()
+        self.model = self.model_class(**self.inherited_model_attr)
         self.view = self.view_class()
         self.item = WidgetItem(self.view, position)
         self.output = Exception("No output yet.")
         self.make_connections()
+
+    @property
+    def inherited_model_attr(self) -> dict:
+        """model attributes which can be inherited from parent widget models"""
+        inherited_attributes = {}
+        for parent in self.parent_list:
+            for k, v in parent.model.get_heritage().items():
+                if v is not None and inherited_attributes.get(k) is None:
+                    inherited_attributes[k] = v
+        return inherited_attributes
 
     def make_connections(self):
         self.view.button.clicked.connect(lambda: self.submit())

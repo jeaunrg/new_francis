@@ -11,6 +11,8 @@ class WidgetEnum(str, Enum):
     basic_morpho_3d = "basic_morpho_3d"
 
 
+DATA_DIR = "data/"
+
 OPERATION_DICT = {
     "morpho:basic": {
         "erosion": morphology.erosion,

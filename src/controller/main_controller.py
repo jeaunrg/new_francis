@@ -35,9 +35,9 @@ def widget_factory(
 
 
 class MainController:
-    def __init__(self):
+    def __init__(self, window_size: tuple = (400, 400)):
         self.model = MainModel()
-        self.view = MainView()
+        self.view = MainView(window_size)
         self.make_connections()
         self.add_tab()
 

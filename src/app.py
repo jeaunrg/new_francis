@@ -11,7 +11,7 @@ def main():
 
     """
     app = QtWidgets.QApplication(sys.argv)
-    cont = main_controller.MainController()
+    cont = main_controller.MainController(window_size=(800, 800))
     cont.view.show()
 
     app.exec()

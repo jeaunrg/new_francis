@@ -1,4 +1,7 @@
-from PyQt5 import QtCore, QtWidgets
+import numpy as np
+from PyQt5 import QtCore, QtGui, QtWidgets
+from src.metadata.func import raise_exception
+from src.view.utils import make_qimage
 
 
 class QRadioButtonGroup(QtWidgets.QButtonGroup):
@@ -15,6 +18,15 @@ class QRadioButtonGroup(QtWidgets.QButtonGroup):
 class QInteractiveImage(QtWidgets.QLabel):
     double_clicked = QtCore.pyqtSignal()
     scrolled = QtCore.pyqtSignal(int)
+
+    def set_array(self, arr: np.ndarray):
+        qimage = make_qimage(arr)
+        if qimage is None:
+            message = f"Image format not known. Shape={arr.shape}, dtype={arr.dtype}, max={arr.max()}, min={arr.min()}"
+            return raise_exception(Exception(message))
+        pixmap = QtGui.QPixmap(qimage)
+        pixmap = pixmap.scaledToWidth(300, QtCore.Qt.FastTransformation)
+        self.setPixmap(pixmap)
 
     def mouseDoubleClickEvent(self, event):
         self.double_clicked.emit()

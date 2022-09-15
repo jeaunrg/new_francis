@@ -1,37 +1,12 @@
-import logging
 from typing import Union
 
 import numpy as np
-from PyQt5 import QtCore, QtGui, QtWidgets
-
-DATA_DIR = "data/"
+from PyQt5 import QtGui, QtWidgets
 
 
-def browse_path(
-    parent: QtWidgets.QWidget or None = None, data_dir: str or None = None
-) -> str:
-    """
-    open a browse window to select a file and update path widget
-    """
-    if data_dir is None:
-        data_dir = DATA_DIR
-    dialog = QtWidgets.QFileDialog()
-    filename, ok = dialog.getOpenFileName(
-        parent,
-        "Select a file...",
-        data_dir,
-        filter="*.nii.gz *.nii *.png *.jpg *.txt *.pkl",
-    )
-    if not ok:
-        filename = ""
-    return filename
-
-
-def raise_exception(exception: Exception):
-    logging.warning(exception)
-
-
-def _get_arr_infos(arr: np.ndarray) -> Union[int or None, QtGui.QImage.Format or None]:
+def _get_arr_infos(
+    arr: np.ndarray,
+) -> Union[int or None, QtGui.QImage.Format or None]:
     bytes_per_line, im_format = None, None
     if arr.ndim == 2:
         bytes_per_line = arr.shape[1]
@@ -47,7 +22,7 @@ def _get_arr_infos(arr: np.ndarray) -> Union[int or None, QtGui.QImage.Format or
     return bytes_per_line, im_format
 
 
-def qimage_from_array(arr: np.ndarray) -> QtGui.QImage or None:
+def make_qimage(arr: np.ndarray) -> QtGui.QImage or None:
     bytes_per_line, im_format = _get_arr_infos(arr)
     if bytes_per_line is None or im_format is None:
         return None
@@ -59,3 +34,21 @@ def qimage_from_array(arr: np.ndarray) -> QtGui.QImage or None:
         im_format,
     )
     return qimage
+
+
+def browse_path(
+    data_dir: str or None = None, parent: QtWidgets.QWidget or None = None
+) -> str:
+    """
+    open a browse window to select a file and update path widget
+    """
+    dialog = QtWidgets.QFileDialog()
+    filename, ok = dialog.getOpenFileName(
+        parent,
+        "Select a file...",
+        data_dir,
+        filter="*.nii.gz *.nii *.png *.jpg *.txt *.pkl",
+    )
+    if not ok:
+        filename = ""
+    return filename

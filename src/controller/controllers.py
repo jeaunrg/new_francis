@@ -1,10 +1,8 @@
 from abc import abstractmethod
-from typing import Union
 
 from PyQt5 import QtCore
 from src.controller.mixin import Output2dImageMixin, Output3dImageMixin, OutputTextMixin
-from src.controller.utils import browse_path
-from src.metadata.metadata import WidgetEnum
+from src.metadata.metadata import DATA_DIR, WidgetEnum
 from src.model.models import (
     BasicMorpho2dWM,
     BasicMorpho3dWM,
@@ -15,6 +13,7 @@ from src.model.models import (
     WidgetModel,
 )
 from src.view.items import WidgetItem
+from src.view.utils import browse_path
 from src.view.views import (
     BasicMorphoWV,
     LoadFileWV,
@@ -71,7 +70,7 @@ class LoadFileW(Widget):
         self.view.browse.clicked.connect(lambda: self.set_browse_path())
 
     def set_browse_path(self):
-        filename = browse_path()
+        filename = browse_path(DATA_DIR)
         if filename != "":
             self.view.path.setText(filename)
             self.view.path.setToolTip(filename)

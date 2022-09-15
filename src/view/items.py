@@ -48,8 +48,9 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         self.arrow_len = 10
         self.space = [10, 20]
 
+    @staticmethod
     def intersects(
-        self, line: QtCore.QLineF, rect: QtCore.QRect, rect_position: QtCore.QPoint
+        line: QtCore.QLineF, rect: QtCore.QRect, rect_position: QtCore.QPoint
     ) -> QtCore.QPointF:
         """
         This method find the intersection between widget rect and line
@@ -100,10 +101,10 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         )
 
         # set arrow points
-        parent_intersection = self.intersects(line, r1, parent.pos())
+        parent_intersection = GraphLinkItem.intersects(line, r1, parent.pos())
         if parent_intersection is None:
             return self.setPolygon(QtGui.QPolygonF())
-        child_intersection = self.intersects(line, r2, child.pos())
+        child_intersection = GraphLinkItem.intersects(line, r2, child.pos())
         if child_intersection is None:
             return self.setPolygon(QtGui.QPolygonF())
         p1 = parent_intersection + unit * self.space[0]

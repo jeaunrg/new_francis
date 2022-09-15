@@ -12,11 +12,11 @@ POPUPS = {
 
 
 class MainView(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, window_size: tuple = (400, 400)):
         super().__init__()
         self.setWindowState(QtCore.Qt.WindowActive)
         self.setWindowTitle("NewFrancis")
-        self.resize(400, 400)
+        self.resize(*window_size)
         tab_widget = QtWidgets.QTabWidget()
         tab_widget.setTabsClosable(True)
         new_tab_button = QtWidgets.QPushButton("+")

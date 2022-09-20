@@ -4,6 +4,8 @@ from src.metadata.metadata import POPUPS
 
 
 class MainView(QtWidgets.QMainWindow):
+    closed = QtCore.pyqtSignal()
+
     def __init__(self, window_size: tuple = (400, 400)):
         super().__init__()
         self.setWindowState(QtCore.Qt.WindowActive)
@@ -14,10 +16,26 @@ class MainView(QtWidgets.QMainWindow):
         new_tab_button = QtWidgets.QPushButton("+")
         tab_widget.setCornerWidget(new_tab_button)
         self.setCentralWidget(tab_widget)
+        self.restore_window_state()
 
     def popup_dialog(self, popup_key: str):
         question, responses = POPUPS[popup_key]
         return QMessageBox.question(self, "", question, responses)
+
+    def closeEvent(self, event):
+        self.save_window_state()
+        self.closed.emit()
+        return super().closeEvent(event)
+
+    def save_window_state(self):
+        settings = QtCore.QSettings("FrancisInc", "FrancisApp")
+        settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("windowState", self.saveState())
+
+    def restore_window_state(self):
+        settings = QtCore.QSettings("FrancisInc", "FrancisApp")
+        self.restoreGeometry(settings.value("geometry"))
+        self.restoreState(settings.value("windowState"))
 
 
 class GraphView(QtWidgets.QGraphicsView):
@@ -32,6 +50,9 @@ class GraphView(QtWidgets.QGraphicsView):
         position = QtGui.QCursor.pos()
         self.right_clicked.emit(position)
         return super().contextMenuEvent(event)
+
+    def closeEvent(self, event):
+        print("close graph")
 
 
 class Menu(QtWidgets.QMenu):

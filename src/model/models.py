@@ -22,7 +22,7 @@ class WidgetModel:
     def compute(self, *args, **kwargs):
         pass
 
-    def delete(self):
+    def close(self):
         pass
 
 

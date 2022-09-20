@@ -74,15 +74,16 @@ class Widget:
     def set_view_output(self, output):
         pass
 
-    def delete(self):
+    def close(self):
         for child in self.child_list:
-            child.delete()
+            child.close()
         for link in self.link_list:
-            link.delete()
+            link.close()
         for parent in self.parent_list:
-            parent.child_list.remove(self)
-        self.item.delete()
-        self.model.delete()
+            if self in parent.child_list:
+                parent.child_list.remove(self)
+        self.item.close()
+        self.model.close()
 
 
 class LoadFileW(Widget):

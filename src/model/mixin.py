@@ -22,12 +22,14 @@ class OutputImageMixin:
         if self.block_size is None:
             ratio = arr.nbytes / 1000000
             if ratio > 1:
-                self.is_downsized = True
-                np.save(self.path, arr)
+                print("save as ", self.path)
+
                 block_size = int(ratio ** (1 / arr.ndim))
             else:
                 block_size = 1
             self.block_size = tuple([block_size] * arr.ndim)
+        self.is_downsized = True
+        np.save(self.path, arr)
         arr = block_reduce(arr, self.block_size, func=np.mean)
         return arr
 
@@ -44,6 +46,6 @@ class OutputImageMixin:
     def get_raw_array(self):
         return np.load(self.path)
 
-    def delete(self):
+    def close(self):
         if os.path.isfile(self.path):
             os.remove(self.path)

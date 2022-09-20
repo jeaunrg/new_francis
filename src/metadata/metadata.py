@@ -25,7 +25,7 @@ OPERATION_DICT = {
     }
 }
 
-WIDGET_NAME_DICT = {
+WIDGET_KEY_DICT = {
     "load:image": WidgetEnum.load_im,
     "load:3dimage": WidgetEnum.load_3d_im,
     "load:text": WidgetEnum.load_txt,

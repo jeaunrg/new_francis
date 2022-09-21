@@ -12,11 +12,11 @@ class Output2dImageMixin:
         super().submit()
 
     def get_view_output(self):
-        if self.model.is_downsized:
+        if self.model.has_downsized_output:
             return self.model.get_raw_array()
         return self.output
 
-    def set_view_output(self, output: Union[np.ndarray, Exception]):
+    def set_view_output(self, output: np.ndarray or Exception):
         if isinstance(output, Exception):
             return raise_exception(output)
         self.view.image.set_array(output)
@@ -85,7 +85,7 @@ class Output3dImageMixin(Output2dImageMixin):
                 self.update_section(value=w.sections[i])
             self.update_viewpoint(value=w.viewpoint)
 
-    def set_view_output(self, output: Union[np.ndarray, Exception] = None):
+    def set_view_output(self, output: Union[np.ndarray, Exception] or None = None):
         if not isinstance(self.output, Exception):
             if isinstance(output, np.ndarray):
                 self.init_sections_and_viewpoint()
@@ -96,10 +96,3 @@ class Output3dImageMixin(Output2dImageMixin):
             elif self.viewpoint == 2:
                 output = self.output[:, :, self.sections[2]]
         return super().set_view_output(output)
-
-
-class OutputTextMixin:
-    def set_view_output(self, output: Union[str, Exception]):
-        if isinstance(output, Exception):
-            return raise_exception(output)
-        self.view.text.setText(output)

@@ -5,11 +5,11 @@ import numpy as np
 from skimage.measure import block_reduce
 
 
-class OutputImageMixin:
+class CompressionMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.block_size = None
-        self.is_downsized = False
+        self.has_downsized_output = True
         self.path = str(uuid.uuid4()) + ".npy"
 
     def get_heritage(self) -> dict:
@@ -18,17 +18,13 @@ class OutputImageMixin:
         return attributes
 
     def _downsample_raw_array(self, arr: np.ndarray) -> np.ndarray:
-        self.is_downsized = False
         if self.block_size is None:
             ratio = arr.nbytes / 1000000
             if ratio > 1:
-                print("save as ", self.path)
-
                 block_size = int(ratio ** (1 / arr.ndim))
             else:
                 block_size = 1
             self.block_size = tuple([block_size] * arr.ndim)
-        self.is_downsized = True
         np.save(self.path, arr)
         arr = block_reduce(arr, self.block_size, func=np.mean)
         return arr
@@ -46,6 +42,9 @@ class OutputImageMixin:
     def get_raw_array(self):
         return np.load(self.path)
 
-    def close(self):
+    def delete_raw_array(self):
         if os.path.isfile(self.path):
             os.remove(self.path)
+
+    def clean(self):
+        self.delete_raw_array()

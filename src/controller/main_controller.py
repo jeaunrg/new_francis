@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtWidgets
 from src.controller.controllers import (
     BasicMorpho2dW,
     BasicMorpho3dW,
+    GraphLink,
     Load2dImageW,
     Load3dImageW,
     LoadTextW,
@@ -11,7 +12,6 @@ from src.controller.controllers import (
 from src.metadata.func import make_unique_string
 from src.metadata.metadata import RIGHT_CLICK_MENU, WIDGET_KEY_DICT
 from src.model.main_model import MainModel
-from src.view.items import GraphLinkItem
 from src.view.main_view import GraphView, MainView, Menu
 
 
@@ -75,14 +75,14 @@ class GraphController:
         self.view = GraphView()
         self.menu = Menu()
         self.focused_widget = None
-        self.parent_widget_list = []
+        self.selected_widget_list: list[Widget] = []
         self.widget_dict = {}
         self.widget_position = QtCore.QPointF(0, 0)
         self.make_connections()
 
     def make_connections(self):
         self.view.right_clicked.connect(lambda position: self.open_menu(position))
-        self.menu.closed.connect(lambda: self.close_widget())
+        self.menu.closed.connect(lambda: self.close_selected_widgets())
         self.menu.activated.connect(
             lambda activation_key: self.add_widget(WIDGET_KEY_DICT[activation_key])
         )
@@ -94,7 +94,7 @@ class GraphController:
         return widget_list
 
     def open_menu(self, menu_position: QtCore.QPoint):
-        self.parent_widget_list = self.get_selected_widgets()
+        self.selected_widget_list = self.get_selected_widgets()
         self.widget_position = self.view.mapToScene(
             self.view.mapFromGlobal(menu_position)
         )
@@ -110,7 +110,7 @@ class GraphController:
 
     def add_widget(self, widget_key: WidgetEnum):
         widget = widget_factory(
-            widget_key, self.widget_position, self.parent_widget_list
+            widget_key, self.widget_position, self.selected_widget_list
         )
         widget_name = make_unique_string("widget", self.widget_dict.keys())
         self.widget_dict[widget_name] = widget
@@ -119,40 +119,16 @@ class GraphController:
         )
         self.view.scene().addItem(widget.item)
         for parent_widget in widget.parent_list:
-            link = GraphLinkController(parent_widget, widget)
+            link = GraphLink(parent_widget, widget)
             self.view.scene().addItem(link.item)
 
-    def close_widget(self):
-        for parent_widget in self.parent_widget_list:
-            reply = parent_widget.view.popup_dialog("close_widget")
+    def close_selected_widgets(self):
+        for widget in self.selected_widget_list:
+            reply = widget.view.popup_dialog("close_widget")
             if reply == QtWidgets.QMessageBox.Yes:
-                parent_widget.close()
+                widget.close()
 
     def close(self):
         widget_name_list = self.widget_dict.keys()
         for widget_name in widget_name_list:
-            print("close", widget_name)
             self.widget_dict.pop(widget_name).close()
-
-
-class GraphLinkController:
-    def __init__(self, parent: Widget, child: Widget):
-        self.parent = parent
-        self.child = child
-        self.parent.link_list.append(self)
-        self.child.link_list.append(self)
-        self.item = GraphLinkItem()
-        self.make_connections()
-
-    def make_connections(self):
-        self.parent.view.position_changed.connect(
-            lambda: self.item.draw(self.parent.item, self.child.item)
-        )
-        self.child.view.position_changed.connect(
-            lambda: self.item.draw(self.parent.item, self.child.item)
-        )
-
-    def close(self):
-        self.item.close()
-        self.parent.link_list.remove(self)
-        self.child.link_list.remove(self)

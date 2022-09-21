@@ -1,7 +1,8 @@
 from abc import abstractmethod
 
-from PyQt5 import QtCore, QtWidgets
-from src.controller.mixin import Output2dImageMixin, Output3dImageMixin, OutputTextMixin
+from PyQt5 import QtCore
+from src.controller.mixin import Output2dImageMixin, Output3dImageMixin
+from src.metadata.func import raise_exception
 from src.metadata.metadata import WidgetEnum
 from src.model.models import (
     BasicMorpho2dWM,
@@ -12,7 +13,7 @@ from src.model.models import (
     LoadTextWM,
     WidgetModel,
 )
-from src.view.items import WidgetItem
+from src.view.items import GraphLinkItem, WidgetItem
 from src.view.utils import browse_path
 from src.view.views import (
     BasicMorphoWV,
@@ -34,8 +35,8 @@ class Widget:
         self.parent_list = parent_list
         for parent in parent_list:
             parent.child_list.append(self)
-        self.child_list = []
-        self.link_list = []
+        self.child_list: list[Widget] = []
+        self.link_list: list[GraphLink] = []
         self.model = self.model_class()
         self.view = self.view_class()
         self.item = WidgetItem(self.view, position)
@@ -82,8 +83,9 @@ class Widget:
         for parent in self.parent_list:
             if self in parent.child_list:
                 parent.child_list.remove(self)
-        self.item.close()
-        self.model.close()
+        self.item.scene().removeItem(self.item.view.graphicsProxyWidget())
+        self.item.scene().removeItem(self.item)
+        self.model.clean()
 
 
 class LoadFileW(Widget):
@@ -114,9 +116,14 @@ class Load3dImageW(Output3dImageMixin, LoadFileW):
     view_class = LoadImageWV
 
 
-class LoadTextW(OutputTextMixin, LoadFileW):
+class LoadTextW(LoadFileW):
     model_class = LoadTextWM
     view_class = LoadTextWV
+
+    def set_view_output(self, output: str or Exception):
+        if isinstance(output, Exception):
+            return raise_exception(output)
+        self.view.text.setText(output)
 
 
 class BasicMorphoW(Widget):
@@ -139,3 +146,26 @@ class BasicMorpho2dW(Output2dImageMixin, BasicMorphoW):
 class BasicMorpho3dW(Output3dImageMixin, BasicMorphoW):
     model_class = BasicMorpho3dWM
     view_class = BasicMorphoWV
+
+
+class GraphLink:
+    def __init__(self, parent: Widget, child: Widget):
+        self.parent = parent
+        self.child = child
+        self.parent.link_list.append(self)
+        self.child.link_list.append(self)
+        self.item = GraphLinkItem()
+        self.make_connections()
+
+    def make_connections(self):
+        self.parent.view.position_changed.connect(
+            lambda: self.item.draw(self.parent.item, self.child.item)
+        )
+        self.child.view.position_changed.connect(
+            lambda: self.item.draw(self.parent.item, self.child.item)
+        )
+
+    def close(self):
+        self.item.scene().removeItem(self.item)
+        self.parent.link_list.remove(self)
+        self.child.link_list.remove(self)

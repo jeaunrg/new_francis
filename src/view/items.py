@@ -33,10 +33,6 @@ class WidgetItem(QtWidgets.QGraphicsRectItem):
             self.view.position_changed.emit()
         return super().itemChange(change, value)
 
-    def close(self):
-        self.scene().removeItem(self.view.graphicsProxyWidget())
-        self.scene().removeItem(self)
-
 
 class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
     def __init__(self):
@@ -124,6 +120,3 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         p23 = p2 + normal * self.arrow_width - unit * self.arrow_len
         p24 = p2 - normal * self.arrow_width - unit * self.arrow_len
         self.setPolygon(QtGui.QPolygonF([p11, p21, p23, p2, p24, p22, p12, p11]))
-
-    def close(self):
-        self.scene().removeItem(self)

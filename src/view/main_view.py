@@ -51,9 +51,6 @@ class GraphView(QtWidgets.QGraphicsView):
         self.right_clicked.emit(position)
         return super().contextMenuEvent(event)
 
-    def closeEvent(self, event):
-        print("close graph")
-
 
 class Menu(QtWidgets.QMenu):
     activated = QtCore.pyqtSignal(str)

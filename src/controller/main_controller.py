@@ -1,5 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
 from src.controller.controllers import (
+    AdvancedMorpho2dW,
+    AdvancedMorpho3dW,
     BasicMorpho2dW,
     BasicMorpho3dW,
     GraphLink,
@@ -18,16 +20,20 @@ from src.view.main_view import GraphView, MainView, Menu
 def widget_factory(
     widget_key: WidgetEnum, widget_position, parent_list: list[Widget]
 ) -> Widget:
-    if widget_key == WidgetEnum.load_im:
+    if widget_key == WidgetEnum.load_2d_im:
         return Load2dImageW(widget_key, widget_position)
     elif widget_key == WidgetEnum.load_3d_im:
         return Load3dImageW(widget_key, widget_position)
     elif widget_key == WidgetEnum.load_txt:
         return LoadTextW(widget_key, widget_position)
-    elif widget_key == WidgetEnum.basic_morpho:
+    elif widget_key == WidgetEnum.basic_morpho_2d:
         return BasicMorpho2dW(widget_key, widget_position, parent_list[:1])
     elif widget_key == WidgetEnum.basic_morpho_3d:
         return BasicMorpho3dW(widget_key, widget_position, parent_list[:1])
+    elif widget_key == WidgetEnum.advanced_morpho_2d:
+        return AdvancedMorpho2dW(widget_key, widget_position, parent_list[:1])
+    elif widget_key == WidgetEnum.advanced_morpho_3d:
+        return AdvancedMorpho3dW(widget_key, widget_position, parent_list[:1])
     else:
         raise Exception(
             f"Missing condition in widget_factory for widget_name={widget_key}"

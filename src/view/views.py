@@ -1,9 +1,11 @@
 from abc import abstractmethod
 
+import numpy as np
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from src.metadata.metadata import OPERATION_DICT, POPUPS
 from src.view.custom_widgets import QInteractiveImage, QRadioButtonGroup
+from src.view.utils import parse_str_to_array
 
 
 class WidgetView(QtWidgets.QWidget):
@@ -23,7 +25,8 @@ class WidgetView(QtWidgets.QWidget):
 
     def make_grid_widget(self):
         self.make_widgets()
-        grid_dict = self.make_grid_dict()
+        grid_matrix, grid_args = self.make_grid_matrix()
+        grid_dict = self.matrix_to_grid_dict(grid_matrix, grid_args)
         grid_layout = QtWidgets.QGridLayout()
         for widget, grid_anchor in grid_dict.items():
             grid_layout.addWidget(widget, *grid_anchor)
@@ -42,28 +45,35 @@ class WidgetView(QtWidgets.QWidget):
         self.focused.emit(False)
         return super().leaveEvent(event)
 
+    def popup_dialog(self, popup_key: str):
+        question, responses = POPUPS[popup_key]
+        return QMessageBox.question(self, "", question, responses)
+
+    @staticmethod
+    def matrix_to_grid_dict(matrix, args):
+        arr = parse_str_to_array(matrix)
+        grid_dict = {}
+        for value in np.unique(arr):
+            if value == 0:
+                continue
+            line, column = np.where(arr == value)
+            grid_dict[args[value]] = [
+                line.min(),
+                column.min(),
+                line.max() - line.min() + 1,
+                column.max() - column.min() + 1,
+            ]
+        return grid_dict
+
     @abstractmethod
     def make_widgets(self):
         """declare all displayed widgets"""
         pass
 
     @abstractmethod
-    def make_grid_dict(self) -> dict[QtWidgets.QWidget, list[int]]:
-        """arrange declared widgets in grid layout
-
-        Return
-        ------
-        grid_dict = {
-            widget1: [row, column, row_span, column_span],
-            widget2: [row, column],
-            ...
-        }
-        """
+    def make_grid_matrix(self) -> tuple[str, dict]:
+        """declare matrix and args"""
         pass
-
-    def popup_dialog(self, popup_key: str):
-        question, responses = POPUPS[popup_key]
-        return QMessageBox.question(self, "", question, responses)
 
 
 class LoadFileWV(WidgetView):
@@ -73,8 +83,11 @@ class LoadFileWV(WidgetView):
         self.path = QtWidgets.QLineEdit()
         self.browse = QtWidgets.QPushButton("...")
 
-    def make_grid_dict(self) -> dict[QtWidgets.QWidget, list[int]]:
-        return {self.path: [0, 0], self.browse: [0, 1]}
+    def make_grid_matrix(self):
+        grid_matrix = """
+        1 2 
+        """
+        return grid_matrix, {1: self.path, 2: self.browse}
 
 
 class LoadImageWV(LoadFileWV):
@@ -82,10 +95,12 @@ class LoadImageWV(LoadFileWV):
         super().make_widgets()
         self.image = QInteractiveImage()
 
-    def make_grid_dict(self) -> dict[QtWidgets.QWidget, list[int]]:
-        grid_dict = super().make_grid_dict()
-        grid_dict[self.image] = [1, 0, 1, 2]
-        return grid_dict
+    def make_grid_matrix(self):
+        grid_matrix = """
+        1 2
+        3 3 
+        """
+        return grid_matrix, {1: self.path, 2: self.browse, 3: self.image}
 
 
 class LoadTextWV(LoadFileWV):
@@ -93,10 +108,12 @@ class LoadTextWV(LoadFileWV):
         super().make_widgets()
         self.text = QtWidgets.QTextEdit()
 
-    def make_grid_dict(self) -> dict[QtWidgets.QWidget, list[int]]:
-        grid_dict = super().make_grid_dict()
-        grid_dict[self.text] = [1, 0, 1, 2]
-        return grid_dict
+    def make_grid_matrix(self):
+        grid_matrix = """
+        1 2 
+        3 3
+        """
+        return grid_matrix, {1: self.path, 2: self.browse, 3: self.text}
 
 
 class BasicMorphoWV(WidgetView):
@@ -108,14 +125,31 @@ class BasicMorphoWV(WidgetView):
         self.is_round_shape = QtWidgets.QCheckBox("round shape")
         self.image = QInteractiveImage()
 
-    def make_grid_dict(self) -> dict[QtWidgets.QWidget, list[int]]:
-        grid_dict = {}
-        for i, button in enumerate(self.operations.buttons):
-            if i < 3:
-                grid_dict[button] = [0, i]
-            else:
-                grid_dict[button] = [1, i - 3]
-        grid_dict[self.size] = [2, 0]
-        grid_dict[self.is_round_shape] = [2, 1]
-        grid_dict[self.image] = [3, 0, 1, 3]
-        return grid_dict
+    def make_grid_matrix(self):
+        grid_matrix = """
+        1 2 3
+        4 5 6
+        7 8
+        9 9 9
+        """
+        args = {i + 1: self.operations.buttons[i] for i in range(6)}
+        args.update({7: self.size, 8: self.is_round_shape, 9: self.image})
+        return grid_matrix, args
+
+
+class AdvancedMorphoWV(WidgetView):
+    submit_text = "apply"
+
+    def make_widgets(self):
+        self.operations = QRadioButtonGroup(OPERATION_DICT["morpho:advanced"].keys())
+        self.image = QInteractiveImage()
+
+    def make_grid_matrix(self):
+        grid_matrix = """
+        1 2 3  
+        4 5
+        6 6 6
+        """
+        args = {i + 1: self.operations.buttons[i] for i in range(5)}
+        args.update({6: self.image})
+        return grid_matrix, args

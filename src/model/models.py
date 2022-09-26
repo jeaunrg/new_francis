@@ -117,3 +117,15 @@ class BasicMorpho3dWM(CompressionMixin, WidgetModel):
         )
         arr = function(arr, selem)
         return arr
+
+
+class AdvancedMorphoWM(CompressionMixin, WidgetModel):
+    @CompressionMixin.downsize
+    def compute(
+        self,
+        arr: np.ndarray,
+        operation: str,
+    ) -> np.ndarray or Exception:
+        function = OPERATION_DICT["morpho:advanced"].get(operation)
+        arr = function(arr)
+        return arr

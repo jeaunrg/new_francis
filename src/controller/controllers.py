@@ -5,6 +5,7 @@ from src.controller.mixin import Output2dImageMixin, Output3dImageMixin
 from src.metadata.func import raise_exception
 from src.metadata.metadata import WidgetEnum
 from src.model.models import (
+    AdvancedMorphoWM,
     BasicMorpho2dWM,
     BasicMorpho3dWM,
     Load2dImageWM,
@@ -16,6 +17,7 @@ from src.model.models import (
 from src.view.items import GraphLinkItem, WidgetItem
 from src.view.utils import browse_path
 from src.view.views import (
+    AdvancedMorphoWV,
     BasicMorphoWV,
     LoadFileWV,
     LoadImageWV,
@@ -146,6 +148,25 @@ class BasicMorpho2dW(Output2dImageMixin, BasicMorphoW):
 class BasicMorpho3dW(Output3dImageMixin, BasicMorphoW):
     model_class = BasicMorpho3dWM
     view_class = BasicMorphoWV
+
+
+class AdvancedMorphoW(Widget):
+    model_class = AdvancedMorphoWM
+    view_class = AdvancedMorphoWV
+
+    def get_view_input(self) -> dict:
+        return {
+            "arr": self.parent_list[0].get_view_output(),
+            "operation": self.view.operations.checkedButton().text(),
+        }
+
+
+class AdvancedMorpho2dW(Output2dImageMixin, AdvancedMorphoW):
+    pass
+
+
+class AdvancedMorpho3dW(Output3dImageMixin, AdvancedMorphoW):
+    pass
 
 
 class GraphLink:

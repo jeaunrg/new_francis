@@ -51,3 +51,23 @@ def browse_path(parent: QtWidgets.QWidget or None = None) -> str:
     if not ok:
         filename = ""
     return filename
+
+
+def parse_str_to_array(str_arr):
+    line_list = []
+    max_len = 0
+    for line in str_arr.split("\n"):
+        line = line.strip()
+        if line != "":
+            line = line.split(" ")
+            line_list.append([])
+            for cell in line:
+                cell = cell.strip()
+                if cell != "":
+                    line_list[-1].append(int(cell))
+            if len(line) > max_len:
+                max_len = len(line)
+    for i, line in enumerate(line_list):
+        line_list[i] += [0] * (max_len - len(line))
+    arr = np.array(line_list)
+    return arr

@@ -45,7 +45,7 @@ def browse_path(parent: QtWidgets.QWidget or None = None) -> str:
     filename, ok = dialog.getOpenFileName(
         parent,
         "Select a file...",
-        DATA_DIR,
+        str(DATA_DIR),
         filter="*.nii.gz *.nii *.png *.jpg *.txt *.pkl",
     )
     if not ok:

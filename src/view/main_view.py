@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
-from src.metadata.metadata import POPUPS
+from src.metadata.metadata import POPUPS, WidgetEnum
 
 
 class MainView(QtWidgets.QMainWindow):
@@ -53,27 +53,27 @@ class GraphView(QtWidgets.QGraphicsView):
 
 
 class Menu(QtWidgets.QMenu):
-    activated = QtCore.pyqtSignal(str)
+    activated = QtCore.pyqtSignal(WidgetEnum)
     closed = QtCore.pyqtSignal()
 
     def __init__(self, menu_dict: dict = {}):
         super().__init__()
         self.build(menu_dict)
 
-    def build(self, menu_dict: dict):
+    def build(self, menu_hierarchy: dict):
         self.clear()
-        for key, values in menu_dict.items():
-            self._build_recursively(self, key, values, key)
+        for label, submenu_hierarchy in menu_hierarchy.items():
+            self._build_recursively(self, label, submenu_hierarchy)
         close_action = self.addAction("close")
         close_action.triggered.connect(lambda: self.closed.emit())
 
     def _build_recursively(
-        self, menu: QtWidgets.QMenu, key: str, values: dict, activation_key: str
+        self, menu: QtWidgets.QMenu, label: str, submenu_hierarchy: dict or WidgetEnum
     ):
-        if len(values) == 0:
-            action = menu.addAction(key)
-            action.triggered.connect(lambda: self.activated.emit(activation_key))
-        else:
-            submenu = menu.addMenu(key)
-            for key, values in values.items():
-                self._build_recursively(submenu, key, values, f"{activation_key}:{key}")
+        submenu = menu.addMenu(label)
+        if isinstance(submenu_hierarchy, dict):
+            for label, submenu_hierarchy in submenu_hierarchy.items():
+                self._build_recursively(submenu, label, submenu_hierarchy)
+        elif isinstance(submenu_hierarchy, WidgetEnum):
+            action = submenu.addAction(submenu_hierarchy)
+            action.triggered.connect(lambda: self.activated.emit(submenu_hierarchy))

@@ -31,9 +31,9 @@ class Widget:
     view_class = WidgetView
 
     def __init__(
-        self, name: WidgetEnum, position: QtCore.QPointF, parent_list: list = []
+        self, key: WidgetEnum, position: QtCore.QPointF, parent_list: list = []
     ):
-        self.name = name
+        self.key = key
         self.parent_list = parent_list
         for parent in parent_list:
             parent.child_list.append(self)

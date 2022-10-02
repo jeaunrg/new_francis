@@ -9,10 +9,10 @@ from src.controller.controllers import (
     Load3dImageW,
     LoadTextW,
     Widget,
-    WidgetEnum,
 )
 from src.metadata.func import make_unique_string
-from src.metadata.metadata import RIGHT_CLICK_MENU, WIDGET_KEY_DICT
+from src.metadata.menu import MENU_DICT
+from src.metadata.metadata import WidgetEnum
 from src.model.main_model import MainModel
 from src.view.main_view import GraphView, MainView, Menu
 
@@ -89,9 +89,7 @@ class GraphController:
     def make_connections(self):
         self.view.right_clicked.connect(lambda position: self.open_menu(position))
         self.menu.closed.connect(lambda: self.close_selected_widgets())
-        self.menu.activated.connect(
-            lambda activation_key: self.add_widget(WIDGET_KEY_DICT[activation_key])
-        )
+        self.menu.activated.connect(lambda widget_key: self.add_widget(widget_key))
 
     def get_selected_widgets(self):
         widget_list = [w for w in self.widget_dict.values() if w.view.is_selected()]
@@ -99,13 +97,23 @@ class GraphController:
             widget_list.append(self.focused_widget)
         return widget_list
 
-    def open_menu(self, menu_position: QtCore.QPoint):
+    def get_menu_hierarchy(self) -> dict:
         self.selected_widget_list = self.get_selected_widgets()
+        if len(self.selected_widget_list) == 0:
+            menu_key = "scene"
+        elif len(self.selected_widget_list) == 1:
+            menu_key = self.selected_widget_list[0].key
+        else:
+            raise ValueError("Condition not implemented")
+        menu_hierarchy = MENU_DICT[menu_key]
+        return menu_hierarchy
+
+    def open_menu(self, menu_position: QtCore.QPoint):
         self.widget_position = self.view.mapToScene(
             self.view.mapFromGlobal(menu_position)
         )
-        menu_key = "scene" if self.focused_widget is None else self.focused_widget.name
-        self.menu.build(RIGHT_CLICK_MENU[menu_key])
+        menu_hierarchy = self.get_menu_hierarchy()
+        self.menu.build(menu_hierarchy)
         self.menu.exec(menu_position)
 
     def update_focused_widget(self, widget: Widget, focused: bool):

@@ -67,13 +67,20 @@ class Menu(QtWidgets.QMenu):
         close_action = self.addAction("close")
         close_action.triggered.connect(lambda: self.closed.emit())
 
+    def _add_action(self, menu: QtWidgets.QMenu, widget_key: WidgetEnum):
+        action = menu.addAction(widget_key)
+        action.triggered.connect(lambda: self.activated.emit(widget_key))
+
     def _build_recursively(
-        self, menu: QtWidgets.QMenu, label: str, submenu_hierarchy: dict or WidgetEnum
+        self,
+        menu: QtWidgets.QMenu,
+        label: str,
+        submenu_hierarchy: dict or list[WidgetEnum],
     ):
         submenu = menu.addMenu(label)
         if isinstance(submenu_hierarchy, dict):
             for label, submenu_hierarchy in submenu_hierarchy.items():
                 self._build_recursively(submenu, label, submenu_hierarchy)
-        elif isinstance(submenu_hierarchy, WidgetEnum):
-            action = submenu.addAction(submenu_hierarchy)
-            action.triggered.connect(lambda: self.activated.emit(submenu_hierarchy))
+        elif isinstance(submenu_hierarchy, list):
+            for widget_key in submenu_hierarchy:
+                self._add_action(submenu, widget_key)

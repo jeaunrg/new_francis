@@ -153,3 +153,20 @@ class AdvancedMorphoWV(WidgetView):
         args = {i + 1: self.operations.buttons[i] for i in range(5)}
         args.update({6: self.image})
         return grid_matrix, args
+
+
+class FilterWV(WidgetView):
+    submit_text = "apply"
+
+    def make_widgets(self):
+        self.operations = QRadioButtonGroup(OPERATION_DICT["filter"].keys())
+        self.image = QInteractiveImage()
+
+    def make_grid_matrix(self):
+        grid_matrix = """
+        1 2  
+        6 6
+        """
+        args = {i + 1: self.operations.buttons[i] for i in range(2)}
+        args.update({6: self.image})
+        return grid_matrix, args

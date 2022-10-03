@@ -37,7 +37,9 @@ def make_qimage(arr: np.ndarray) -> QtGui.QImage or None:
     return qimage
 
 
-def browse_path(parent: QtWidgets.QWidget or None = None) -> str:
+def browse_path(
+    parent: QtWidgets.QWidget or None = None, extensions: list[str] = ()
+) -> str:
     """
     open a browse window to select a file and update path widget
     """
@@ -46,7 +48,8 @@ def browse_path(parent: QtWidgets.QWidget or None = None) -> str:
         parent,
         "Select a file...",
         str(DATA_DIR),
-        filter="*.nii.gz *.nii *.png *.jpg *.txt *.pkl",
+        filter="*."
+        + " *.".join(extensions),  # *.nii.gz *.nii *.png *.jpg *.txt *.pkl",
     )
     if not ok:
         filename = ""

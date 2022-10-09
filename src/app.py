@@ -2,7 +2,7 @@ import sys
 
 from PyQt5 import QtWidgets
 
-from src.controller import main_controller
+from src.controller.main import MainController
 
 
 def main():
@@ -11,7 +11,7 @@ def main():
 
     """
     app = QtWidgets.QApplication(sys.argv)
-    cont = main_controller.MainController(window_size=(800, 800))
-    cont.view.show()
+    controller = MainController(window_size=(800, 800))
+    controller.view.show()
 
     app.exec()

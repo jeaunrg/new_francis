@@ -3,8 +3,8 @@ from src.controller.controllers import GraphLink, Widget, widget_factory
 from src.metadata.config import MENU_DICT
 from src.metadata.func import make_unique_string
 from src.metadata.metadata import WidgetEnum
-from src.model.main_model import MainModel
-from src.view.main_view import GraphView, MainView, Menu
+from src.model.main import MainModel
+from src.view.main import GraphView, MainView, Menu
 
 
 class MainController:

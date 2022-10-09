@@ -1,7 +1,7 @@
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 from src.metadata.func import raise_exception
-from src.view.utils import make_qimage
+from src.view.misc.func import make_qimage
 
 
 class QRadioButtonGroup(QtWidgets.QButtonGroup):

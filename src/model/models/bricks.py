@@ -10,6 +10,27 @@ from src.metadata.metadata import OPERATION_DICT
 from src.model.models.base import WidgetModel
 from src.model.models.mixin import CompressionMixin
 
+"""
+from skimage import (
+    color, feature, filters, measure, morphology, segmentation, util
+)
+
+image = skimage.data.human_mitosis()
+thresholds = filters.threshold_multiotsu(image, classes=3)
+regions = np.digitize(image, bins=thresholds)
+cells = image > thresholds[0]
+dividing = image > thresholds[1]
+labeled_cells = measure.label(cells)
+labeled_dividing = measure.label(dividing)
+naive_mi = labeled_dividing.max() / labeled_cells.max()
+
+higher_threshold = 125
+dividing = image > higher_threshold
+smoother_dividing = filters.rank.mean(util.img_as_ubyte(dividing),
+                                      morphology.disk(4))
+binary_smoother_dividing = smoother_dividing > 20
+"""
+
 
 class LoadFileWM(WidgetModel):
     accepted_extensions = []

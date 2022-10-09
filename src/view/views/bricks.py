@@ -92,9 +92,9 @@ class FilterWV(WidgetView):
 
     def make_grid_matrix(self):
         grid_matrix = """
-        1 2  
-        6 6
+        1 
+        3 3
         """
-        args = {i + 1: self.operations.buttons[i] for i in range(2)}
-        args.update({6: self.image})
+        args = {i + 1: self.operations.buttons[i] for i in range(1)}
+        args.update({3: self.image})
         return grid_matrix, args

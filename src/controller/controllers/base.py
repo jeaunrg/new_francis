@@ -18,6 +18,7 @@ class Widget:
         self.parent_list = parent_list
         for parent in parent_list:
             parent.child_list.append(self)
+        position = self.get_initial_position(position)
         self.child_list: list[Widget] = []
         self.link_list: list[GraphLink] = []
         self.model = self.model_class()
@@ -25,6 +26,14 @@ class Widget:
         self.item = WidgetItem(self.view, position)
         self.output = Exception("No output yet.")
         self.make_connections()
+
+    def get_initial_position(self, default_position: QtCore.QPointF) -> QtCore.QPointF:
+        if len(self.parent_list) == 0:
+            return default_position
+        else:
+            rect = self.parent_list[0].item.proxy_rect()
+            pos = self.parent_list[0].item.pos()
+            return pos + QtCore.QPointF(rect.width(), 0)
 
     def inherited_model_attr(self) -> dict:
         """model attributes which can be inherited from parent widget models"""

@@ -98,3 +98,20 @@ class FilterWV(WidgetView):
         args = {i + 1: self.operations.buttons[i] for i in range(1)}
         args.update({3: self.image})
         return grid_matrix, args
+
+
+class ThresholdWV(WidgetView):
+    submit_text = "apply"
+
+    def make_widgets(self):
+        self.operations = QRadioButtonGroup(OPERATION_DICT["threshold"].keys())
+        self.label = QtWidgets.QLabel()
+
+    def make_grid_matrix(self):
+        grid_matrix = """
+        1 
+        2
+        """
+        args = {i + 1: self.operations.buttons[i] for i in range(1)}
+        args.update({2: self.label})
+        return grid_matrix, args

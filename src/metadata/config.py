@@ -6,6 +6,7 @@ MENU_2D = {
         "advanced": [WidgetEnum.advanced_morpho_2d],
     },
     "filter": [WidgetEnum.filter_2d],
+    "threshold": [WidgetEnum.threshold],
 }
 MENU_3D = {
     "morpho": {
@@ -25,4 +26,5 @@ MENU_DICT = {
     WidgetEnum.basic_morpho_3d: MENU_3D,
     WidgetEnum.advanced_morpho_2d: MENU_2D,
     WidgetEnum.advanced_morpho_3d: MENU_3D,
+    WidgetEnum.threshold: MENU_2D,
 }

@@ -15,6 +15,7 @@ class WidgetEnum(str, Enum):
     advanced_morpho_3d = "advanced morpho 3d"
     filter_2d = "filter 2d"
     filter_3d = "filter 3d"
+    threshold = "threshold"
 
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
@@ -38,6 +39,7 @@ OPERATION_DICT = {
     "filter": {
         "sauvola threshold": filters.threshold_sauvola,
     },
+    "threshold": {"multiotsu": filters.threshold_multiotsu},
 }
 
 

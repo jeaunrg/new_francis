@@ -136,3 +136,10 @@ class FilterWM(CompressionMixin, WidgetModel):
         function = OPERATION_DICT["filter"].get(operation)
         arr = function(arr)
         return arr
+
+
+class ThresholdWM(WidgetModel):
+    def compute(self, arr: np.ndarray, operation: str) -> list or Exception:
+        function = OPERATION_DICT["threshold"].get(operation)
+        thresholds = function(arr)
+        return thresholds

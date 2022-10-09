@@ -15,7 +15,8 @@ class WidgetEnum(str, Enum):
     advanced_morpho_3d = "advanced morpho 3d"
     filter_2d = "filter 2d"
     filter_3d = "filter 3d"
-    threshold = "threshold"
+    threshold_2d = "threshold 2d"
+    threshold_3d = "threshold 3d"
 
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"

@@ -1,6 +1,5 @@
 from src.controller.controllers.base import Widget
-from src.controller.controllers.mixin import (Output2dImageMixin,
-                                              Output3dImageMixin)
+from src.controller.controllers.mixin import Output2dImageMixin, Output3dImageMixin
 from src.metadata.func import raise_exception
 from src.metadata.metadata import WidgetEnum
 from src.model import models as mo
@@ -29,8 +28,10 @@ def widget_factory(
         return Filter2dW(widget_key, widget_position, parent_list[:1])
     elif widget_key == WidgetEnum.filter_3d:
         return Filter2dW(widget_key, widget_position, parent_list[:1])
-    elif widget_key == WidgetEnum.threshold:
-        return ThresholdW(widget_key, widget_position, parent_list[:1])
+    elif widget_key == WidgetEnum.threshold_2d:
+        return Threshold2dW(widget_key, widget_position, parent_list[:1])
+    elif widget_key == WidgetEnum.threshold_3d:
+        return Threshold3dW(widget_key, widget_position, parent_list[:1])
     else:
         raise Exception(
             f"Missing condition in widget_factory for widget_name={widget_key}"
@@ -73,10 +74,10 @@ class LoadTextW(LoadFileW):
     view_class = vu.LoadTextWV
     extensions = ["txt"]
 
-    def set_view_output(self, output: str or Exception):
-        if isinstance(output, Exception):
-            return raise_exception(output)
-        self.view.text.setText(output)
+    def set_view_output(self, model_output: str or Exception):
+        if isinstance(model_output, Exception):
+            return raise_exception(model_output)
+        self.view.text.setText(model_output)
 
 
 class BasicMorphoW(Widget):
@@ -149,8 +150,16 @@ class ThresholdW(Widget):
             "operation": self.view.operations.checkedButton().text(),
         }
 
-    def set_view_output(self, output: list or Exception):
-        if isinstance(output, Exception):
-            return raise_exception(output)
-        output = [str(n) for n in output]
-        self.view.label.setText(" | ".join(output))
+    def set_view_output(self, model_output: list or Exception):
+        if isinstance(model_output, Exception):
+            return raise_exception(model_output)
+        model_output = [str(n) for n in model_output]
+        self.view.label.setText(", ".join(model_output))
+
+
+class Threshold2dW(ThresholdW):
+    pass
+
+
+class Threshold3dW(ThresholdW):
+    pass

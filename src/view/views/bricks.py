@@ -15,7 +15,8 @@ class LoadFileWV(WidgetView):
         grid_matrix = """
         1 2 
         """
-        return grid_matrix, {1: self.path, 2: self.browse}
+        args = {1: self.path, 2: self.browse}
+        return grid_matrix, args
 
 
 class LoadImageWV(LoadFileWV):
@@ -28,7 +29,8 @@ class LoadImageWV(LoadFileWV):
         1 2
         3 3 
         """
-        return grid_matrix, {1: self.path, 2: self.browse, 3: self.image}
+        args = {1: self.path, 2: self.browse, 3: self.image}
+        return grid_matrix, args
 
 
 class LoadTextWV(LoadFileWV):
@@ -41,7 +43,8 @@ class LoadTextWV(LoadFileWV):
         1 2 
         3 3
         """
-        return grid_matrix, {1: self.path, 2: self.browse, 3: self.text}
+        args = {1: self.path, 2: self.browse, 3: self.text}
+        return grid_matrix, args
 
 
 class BasicMorphoWV(WidgetView):
@@ -109,9 +112,9 @@ class ThresholdWV(WidgetView):
 
     def make_grid_matrix(self):
         grid_matrix = """
-        1 
-        2
+        1 1
+        2 3
         """
         args = {i + 1: self.operations.buttons[i] for i in range(1)}
-        args.update({2: self.label})
+        args.update({2: QtWidgets.QLabel("Thresholds: "), 3: self.label})
         return grid_matrix, args

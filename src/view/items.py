@@ -46,7 +46,7 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
         self.width = 5
         self.arrow_width = 10
         self.arrow_len = 10
-        self.space = [10, 20]
+        self.space = [0, 20]
 
     @staticmethod
     def intersects(
@@ -102,10 +102,10 @@ class GraphLinkItem(QtWidgets.QGraphicsPolygonItem):
 
         # set arrow points
         parent_intersection = GraphLinkItem.intersects(line, r1, parent.pos())
-        if parent_intersection is None:
+        if parent_intersection is None or parent_intersection == QtCore.QPointF():
             return self.setPolygon(QtGui.QPolygonF())
         child_intersection = GraphLinkItem.intersects(line, r2, child.pos())
-        if child_intersection is None:
+        if child_intersection is None or child_intersection == QtCore.QPointF():
             return self.setPolygon(QtGui.QPolygonF())
         p1 = parent_intersection + unit * self.space[0]
         p2 = child_intersection - unit * self.space[1]
